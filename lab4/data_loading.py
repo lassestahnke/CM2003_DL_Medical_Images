@@ -51,7 +51,7 @@ def adjust_data(img, mask):
     return (img, mask)
 
 
-def load_data(base_path, img_path, target_path, img_size, batch_size, augmenation_dic):
+def load_data(base_path, img_path, target_path, img_size=(256, 256, 1), batch_size=8, augmentation_dic=None):
     """
         Function to load data and return a ImageDataGenerator Object for model training
 
@@ -73,11 +73,9 @@ def load_data(base_path, img_path, target_path, img_size, batch_size, augmenatio
     data = pd.DataFrame(data={'img_list': img_list, 'mask_list': target_list})
 
     # get training generator for images and masks
-    data_gen = train_generator()
+    data_gen = train_generator(data,
+                               batch_size=batch_size,
+                               aug_dict=augmentation_dic,
+                               target_size=img_size,
+                               )
     return data_gen
-
-
-base_path = "/DL_course_data/Lab3/X_ray"
-masks = "Mask"
-img = "Image"
-print(load_data(base_path, img, masks))
