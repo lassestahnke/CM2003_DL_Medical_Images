@@ -6,7 +6,12 @@ import os
 
 
 # following function is adopted from https://www.kaggle.com/code/lqdisme/brain-mri-segmentation-unet-keras
-def train_generator(data_frame, batch_size, aug_dict,
+def train_generator(data_frame,
+                    directory,
+                    img_path,
+                    target_path,
+                    batch_size,
+                    aug_dict,
                     image_color_mode="grayscale",
                     mask_color_mode="grayscale",
                     target_size=(256, 256),
@@ -18,6 +23,7 @@ def train_generator(data_frame, batch_size, aug_dict,
     image_generator = image_datagen.flow_from_dataframe(
         data_frame,
         x_col="img_list",
+        directory=os.path.join(directory, img_path),
         class_mode=None,
         color_mode=image_color_mode,
         target_size=target_size,
@@ -28,6 +34,7 @@ def train_generator(data_frame, batch_size, aug_dict,
     mask_generator = mask_datagen.flow_from_dataframe(
         data_frame,
         x_col="mask_list",
+        directory=os.path.join(directory, target_path),
         class_mode=None,
         color_mode=mask_color_mode,
         target_size=target_size,
@@ -51,7 +58,7 @@ def adjust_data(img, mask):
     return (img, mask)
 
 
-def load_data(base_path, img_path, target_path, img_size=(256, 256, 1), batch_size=8, augmentation_dic=None):
+def load_data(base_path, img_path, target_path, img_size=(256, 256), batch_size=8, augmentation_dic=None):
     """
         Function to load data and return a ImageDataGenerator Object for model training
 
@@ -70,12 +77,21 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256, 1), batch_si
     # get image and mask paths and prepare pd.DataFrame
     img_list = os.listdir(os.path.join(base_path, img_path))
     target_list = os.listdir(os.path.join(base_path, target_path))
+    len_data = len(img_list)
     data = pd.DataFrame(data={'img_list': img_list, 'mask_list': target_list})
+
+    print(data)
+
+    if augmentation_dic is None:
+        augmentation_dic={}
 
     # get training generator for images and masks
     data_gen = train_generator(data,
+                               directory=base_path,
+                               img_path=img_path,
+                               target_path=target_path,
                                batch_size=batch_size,
                                aug_dict=augmentation_dic,
                                target_size=img_size,
                                )
-    return data_gen
+    return data_gen, len_data
