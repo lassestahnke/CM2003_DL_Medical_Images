@@ -45,8 +45,8 @@ if __name__ == '__main__':
     input_size = (img_width, img_height, img_ch)
 
     # set paths to data
-    base_path = "/opt/project/X_ray"
-    #base_path = "X_ray"
+    #base_path = "/DL_course_data/Lab3/X_ray"
+    base_path = "X_ray"
     masks = "Mask"
     img = "Image"
 
@@ -56,13 +56,13 @@ if __name__ == '__main__':
                             val_split=val_split,
                             batch_size=batch_size,
                             img_size=(img_width, img_height),
-                            augumentation_dict = augumentation_dict)
+                            augmentation_dic = augumentation_dict)
     # define model
-    unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, batch_size=batch_size, dropout_rate=0.2)
+    unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
     unet.summary()
     unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 #loss=dice_loss,
-                 loss=tf.keras.losses.BinaryCrossentropy(),
+                 loss=dice_loss,
+                 #loss=tf.keras.losses.BinaryCrossentropy(),
                  metrics=[dice_coef])
     unet_hist = unet.fit(train_data_loader,
                         epochs=epochs,

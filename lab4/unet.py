@@ -16,7 +16,7 @@ def conv_block(input, filters, use_batch_norm):
 
     return relu_2
 
-def get_unet(input_shape, n_classes, batch_size, n_base, dropout_rate=0, use_batch_norm=False):
+def get_unet(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=False):
     # define input
     input = Input(shape=input_shape)
     # define encoder
