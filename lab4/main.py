@@ -22,7 +22,7 @@ if __name__ == '__main__':
     img_ch = 1
 
     n_classes = 1
-    n_base = 8
+    n_base = 16
     batch_size = 8
 
     epochs = 150
@@ -34,11 +34,19 @@ if __name__ == '__main__':
     dropout_rate = 0
     use_batch_norm = True
 
+    augumentation_dict = dict(rotation_range = 10,
+                              width_shift_range = 0.1,
+                              height_shift_range = 0.1,
+                              zoom_range = 0.2,
+                              horizontal_flip = True,
+                              fill_mode = 'constant',
+                              cval = 0)
+
     input_size = (img_width, img_height, img_ch)
 
     # set paths to data
-    #base_path = "/DL_course_data/Lab3/X_ray"
-    base_path = "X_ray"
+    base_path = "/opt/project/X_ray"
+    #base_path = "X_ray"
     masks = "Mask"
     img = "Image"
 
@@ -47,13 +55,14 @@ if __name__ == '__main__':
                             target_path=masks,
                             val_split=val_split,
                             batch_size=batch_size,
-                           img_size=(img_width, img_height))
+                            img_size=(img_width, img_height),
+                            augumentation_dict = augumentation_dict)
     # define model
     unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, batch_size=batch_size, dropout_rate=0.2)
     unet.summary()
     unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 loss=dice_loss,
-                 #loss=tf.keras.losses.BinaryCrossentropy(),
+                 #loss=dice_loss,
+                 loss=tf.keras.losses.BinaryCrossentropy(),
                  metrics=[dice_coef])
     unet_hist = unet.fit(train_data_loader,
                         epochs=epochs,
@@ -64,7 +73,7 @@ if __name__ == '__main__':
 
     print(unet_hist.history.keys())
     learning_curves(unet_hist, "loss", "val_loss", "dice_coef", "val_dice_coef")
-    unet.save('models/unet_1c_dice')
+    unet.save('models/unet_1e_CE')
 
     print('finished')
     K.clear_session()

@@ -107,7 +107,6 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                img_path=img_path,
                                target_path=target_path,
                                batch_size=batch_size,
-                               aug_dict=augmentation_dic,
                                target_size=img_size
                                )
     return train_data_gen, val_data_gen, num_train_samples, num_val_samples
