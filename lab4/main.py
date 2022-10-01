@@ -49,20 +49,22 @@ if __name__ == '__main__':
                             batch_size=batch_size,
                            img_size=(img_width, img_height))
     # define model
-    unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, batch_size=batch_size)
+    unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, batch_size=batch_size, dropout_rate=0.2)
     unet.summary()
-    unet.compile(optimizer=Adam(learning_rate=1e-3),
+    unet.compile(optimizer=Adam(learning_rate=learning_rate),
                  loss=dice_loss,
+                 #loss=tf.keras.losses.BinaryCrossentropy(),
                  metrics=[dice_coef])
-    unet_1b_hist = unet.fit(train_data_loader,
+    unet_hist = unet.fit(train_data_loader,
                         epochs=epochs,
                         steps_per_epoch=math.floor(num_train_samples/batch_size),
                         validation_data=val_data_loader,
                         validation_steps=math.floor(num_val_samples/batch_size)
                         )
 
-    print(unet_1b_hist.history.keys())
-    learning_curves(unet_1b_hist, "loss", "val_loss", "dice_coef", "val_dice_coef")
+    print(unet_hist.history.keys())
+    learning_curves(unet_hist, "loss", "val_loss", "dice_coef", "val_dice_coef")
+    unet.save('models/unet_1c_dice')
 
     print('finished')
     K.clear_session()
