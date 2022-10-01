@@ -58,7 +58,7 @@ def adjust_data(img, mask):
     return (img, mask)
 
 
-def load_data(base_path, img_path, target_path, img_size=(256, 256), batch_size=8, augmentation_dic=None):
+def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None):
     """
         Function to load data and return a ImageDataGenerator Object for model training
 
@@ -77,16 +77,23 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), batch_size=
     # get image and mask paths and prepare pd.DataFrame
     img_list = os.listdir(os.path.join(base_path, img_path))
     target_list = os.listdir(os.path.join(base_path, target_path))
-    len_data = len(img_list)
     data = pd.DataFrame(data={'img_list': img_list, 'mask_list': target_list})
 
-    print(data)
+    # shuffle dataframe
+    data = data.sample(frac=1).reset_index(drop=True)
+
+    # split into train and validation set
+    num_train_samples = int(data.shape[0] * (1-val_split))
+    num_val_samples = data.shape[0] - num_train_samples
+
+    train_data = data.iloc[:num_train_samples,:]
+    val_data = data.iloc[num_train_samples:,:]
 
     if augmentation_dic is None:
         augmentation_dic={}
 
     # get training generator for images and masks
-    data_gen = train_generator(data,
+    train_data_gen = train_generator(train_data,
                                directory=base_path,
                                img_path=img_path,
                                target_path=target_path,
@@ -94,4 +101,13 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), batch_size=
                                aug_dict=augmentation_dic,
                                target_size=img_size,
                                )
-    return data_gen, len_data
+
+    val_data_gen = train_generator(val_data,
+                               directory=base_path,
+                               img_path=img_path,
+                               target_path=target_path,
+                               batch_size=batch_size,
+                               aug_dict=augmentation_dic,
+                               target_size=img_size
+                               )
+    return train_data_gen, val_data_gen, num_train_samples, num_val_samples
