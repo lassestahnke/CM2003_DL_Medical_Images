@@ -53,7 +53,7 @@ def train_generator(data_frame,
         yield (img, mask)
 
     # scaling of grayscale image and discretizing mask values
-def adjust_data(img, mask, num_classes, binary_mask=True):
+def adjust_data(img, mask, binary_mask=True):
     img = img / 255.
 
     # Normalize binary segmentation mask
@@ -61,10 +61,12 @@ def adjust_data(img, mask, num_classes, binary_mask=True):
         mask = mask / 255.
         mask[mask > 0] = 1
         mask[mask <= 0] = 0
+        return (img, mask)
     else:
         #todo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
         classes = np.unique(mask)
+        print(classes)
         # every foreground class has its own channel
         shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
         mask_multiclass = np.zeros(shape) # todo: consider batch size in mask.shape
@@ -76,7 +78,7 @@ def adjust_data(img, mask, num_classes, binary_mask=True):
             mask_class_n = mask * (mask==classes[i]) / classes[i]
             mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
 
-    return (img, mask_multiclass)
+        return (img, mask_multiclass)
 
 
 def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
