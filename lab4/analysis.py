@@ -49,3 +49,23 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
         plt.legend()
         plt.show()
     return
+
+def sample_segmentation(data_loader,n_samples=1, model=None):
+
+    for i in range(n_samples):
+        img, msk = next(data_loader)
+
+        # plot original label map
+        plt.imshow(img[0, :, :, :], cmap="gray")
+        plt.imshow(msk[0, :, :, :], cmap="jet", alpha=0.5)
+        plt.title("Ground Truth")
+        plt.show()
+
+        # plot model prediction:
+        if model is not None:
+            plt.imshow(img[0, :, :, :], cmap="gray")
+            pred = model.predict(img)
+            plt.imshow(pred[0,:,:,:])
+            plt.title("Prediction")
+
+    return
