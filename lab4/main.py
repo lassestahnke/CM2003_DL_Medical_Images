@@ -21,7 +21,7 @@ if __name__ == '__main__':
     img_height = 256
     img_ch = 1
 
-    n_classes = 1
+    n_classes = 3
     n_base = 8
     batch_size = 8
 
@@ -57,7 +57,8 @@ if __name__ == '__main__':
                             val_split=val_split,
                             batch_size=batch_size,
                             img_size=(img_width, img_height),
-                            augmentation_dic = augumentation_dict)
+                            augmentation_dic = augumentation_dict,
+                            binary_mask=False)
     # define model
     #unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
     #unet.summary()

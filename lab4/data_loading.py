@@ -41,6 +41,7 @@ def train_generator(data_frame,
         color_mode=mask_color_mode,
         target_size=target_size,
         batch_size=batch_size,
+        order=0,
         seed=seed)
 
     # combining both generators into one
@@ -52,7 +53,7 @@ def train_generator(data_frame,
         yield (img, mask)
 
     # scaling of grayscale image and discretizing mask values
-def adjust_data(img, mask, binary_mask=True):
+def adjust_data(img, mask, num_classes, binary_mask=True):
     img = img / 255.
 
     # Normalize binary segmentation mask
@@ -61,19 +62,21 @@ def adjust_data(img, mask, binary_mask=True):
         mask[mask > 0] = 1
         mask[mask <= 0] = 0
     else:
+        #todo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
         classes = np.unique(mask)
-        # todo throw exception if number if len(classes) != n_classes
         # every foreground class has its own channel
-        mask_multiclass = np.array(mask.shape, len(classes)) # todo: consider batch size in mask.shape
+        shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
+        mask_multiclass = np.zeros(shape) # todo: consider batch size in mask.shape
         for i in range(len(classes)):
             # for multiclass: remove background mask, as it would be 0 anyway
             if i == 0:
                 continue
             # set corresponding pixels in channel to 1 if foreground lavel i is present
-            mask_multiclass[:,:,i] = mask[mask==classes[i]] / classes[i]
+            mask_class_n = mask * (mask==classes[i]) / classes[i]
+            mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
 
-    return (img, mask)
+    return (img, mask_multiclass)
 
 
 def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
@@ -102,18 +105,15 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
     target_list = os.listdir(os.path.join(base_path, target_path))
     target_list.sort()
     data = pd.DataFrame(data={'img_list': img_list, 'mask_list': target_list})
-    print(data)
     # shuffle dataframe
     data = data.sample(frac=1).reset_index(drop=True)
     # todo add option to split data based on number of patients instead of number of images
     # split into train and validation set
     num_train_samples = int(data.shape[0] * (1-val_split))
     num_val_samples = data.shape[0] - num_train_samples
-    print(data)
     train_data = data.iloc[:num_train_samples,:]
     val_data = data.iloc[num_train_samples:,:]
 
-    print(train_data)
     if augmentation_dic is None:
         augmentation_dic={}
 
