@@ -2,7 +2,7 @@
 import os
 
 from unet import get_unet
-from metrics import dice_coef
+from metrics import dice_coef, precision, recall
 from analysis import learning_curves
 from loss import dice_loss
 from data_loading import load_data
@@ -22,10 +22,10 @@ if __name__ == '__main__':
     img_ch = 1
 
     n_classes = 1
-    n_base = 16
+    n_base = 8
     batch_size = 8
 
-    epochs = 150
+    epochs = 50
     learning_rate = 0.0001
 
     val_split = 0.2
@@ -46,7 +46,8 @@ if __name__ == '__main__':
 
     # set paths to data
     #base_path = "/DL_course_data/Lab3/X_ray"
-    base_path = "X_ray"
+    #base_path = "X_ray"
+    base_path = "CT"
     masks = "Mask"
     img = "Image"
 
@@ -58,26 +59,25 @@ if __name__ == '__main__':
                             img_size=(img_width, img_height),
                             augmentation_dic = augumentation_dict)
     # define model
-    unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
-    unet.summary()
-    unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 loss=dice_loss,
-                 #loss=tf.keras.losses.BinaryCrossentropy(),
-                 metrics=[dice_coef])
-    unet_hist = unet.fit(train_data_loader,
-                        epochs=epochs,
-                        steps_per_epoch=math.floor(num_train_samples/batch_size),
-                        validation_data=val_data_loader,
-                        validation_steps=math.floor(num_val_samples/batch_size)
-                        )
+    #unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
+    #unet.summary()
+    #unet.compile(optimizer=Adam(learning_rate=learning_rate),
+    #             loss=dice_loss,
+    #             #loss=tf.keras.losses.BinaryCrossentropy(),
+    #             metrics=[dice_coef, precision, recall])
+    #unet_hist = unet.fit(train_data_loader,
+    #                    epochs=epochs,
+    #                    steps_per_epoch=math.floor(num_train_samples/batch_size),
+    #                    validation_data=val_data_loader,
+    #                    validation_steps=math.floor(num_val_samples/batch_size)
+    #                    )
 
-    print(unet_hist.history.keys())
-    learning_curves(unet_hist, "loss", "val_loss", "dice_coef", "val_dice_coef")
-    unet.save('models/unet_1e_CE')
+    #print(unet_hist.history.keys())
+    #learning_curves(unet_hist, "loss", "val_loss", "dice_coef", "val_dice_coef")
+    #unet.save('models/unet_2b_dice')
 
     print('finished')
     K.clear_session()
-    # todo: binarize segmentation map
 
     # import data
 

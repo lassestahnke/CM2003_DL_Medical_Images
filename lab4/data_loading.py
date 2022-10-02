@@ -1,5 +1,6 @@
 # script for data loading
 import pandas as pd
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
@@ -15,6 +16,7 @@ def train_generator(data_frame,
                     image_color_mode="grayscale",
                     mask_color_mode="grayscale",
                     target_size=(256, 256),
+                    binary_mask=True,
                     seed=1337):
     image_datagen = ImageDataGenerator(**aug_dict)
     mask_datagen = ImageDataGenerator(**aug_dict)
@@ -46,19 +48,36 @@ def train_generator(data_frame,
 
     # rescale image and masks and return generator
     for (img, mask) in train_gen:
-        img, mask = adjust_data(img, mask)
+        img, mask = adjust_data(img, mask, binary_mask)
         yield (img, mask)
 
     # scaling of grayscale image and discretizing mask values
-def adjust_data(img, mask):
+def adjust_data(img, mask, binary_mask=True):
     img = img / 255.
-    mask = mask / 255.
-    mask[mask > 0.5] = 1
-    mask[mask <= 0.5] = 0
+
+    # Normalize binary segmentation mask
+    if binary_mask:
+        mask = mask / 255.
+        mask[mask > 0] = 1
+        mask[mask <= 0] = 0
+    else:
+        # read pixel of individual labels in mask
+        classes = np.unique(mask)
+        # todo throw exception if number if len(classes) != n_classes
+        # every foreground class has its own channel
+        mask_multiclass = np.array(mask.shape, len(classes)) # todo: consider batch size in mask.shape
+        for i in range(len(classes)):
+            # for multiclass: remove background mask, as it would be 0 anyway
+            if i == 0:
+                continue
+            # set corresponding pixels in channel to 1 if foreground lavel i is present
+            mask_multiclass[:,:,i] = mask[mask==classes[i]] / classes[i]
+
     return (img, mask)
 
 
-def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None):
+def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
+              binary_mask=True):
     """
         Function to load data and return a ImageDataGenerator Object for model training
 
@@ -67,28 +86,34 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
             img_path: [string] Name of image directory.
             target_path: [string] Name of mask directory.
             img_size: [tuple] size of image. (img_width, img_height, img_channel).
+            val_split: [float] split of data; relative number of validation data; between 0 and 1
             batch_size: [int] Number of samples per batch.
             augmentation_dic: [dict] Dictionary of augmentation arguments.
                                     See tf.keras.preprocessing.image.ImageDataGenerator doc for info.
+            binary_mask: [bool] Bool if binary segmentation mask is used. If True: maks has one channel and two;
+                                If False: mask has n-unique channels.
         returns:
             data_gen: [iterator]: Training generator
     """
 
     # get image and mask paths and prepare pd.DataFrame
     img_list = os.listdir(os.path.join(base_path, img_path))
+    img_list.sort()
     target_list = os.listdir(os.path.join(base_path, target_path))
+    target_list.sort()
     data = pd.DataFrame(data={'img_list': img_list, 'mask_list': target_list})
-
+    print(data)
     # shuffle dataframe
     data = data.sample(frac=1).reset_index(drop=True)
-
+    # todo add option to split data based on number of patients instead of number of images
     # split into train and validation set
     num_train_samples = int(data.shape[0] * (1-val_split))
     num_val_samples = data.shape[0] - num_train_samples
-
+    print(data)
     train_data = data.iloc[:num_train_samples,:]
     val_data = data.iloc[num_train_samples:,:]
 
+    print(train_data)
     if augmentation_dic is None:
         augmentation_dic={}
 
@@ -100,6 +125,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                batch_size=batch_size,
                                aug_dict=augmentation_dic,
                                target_size=img_size,
+                               binary_mask=binary_mask
                                )
 
     val_data_gen = train_generator(val_data,
@@ -108,6 +134,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                target_path=target_path,
                                batch_size=batch_size,
                                aug_dict={},
-                               target_size=img_size
+                               target_size=img_size,
+                               binary_mask = binary_mask
                                )
     return train_data_gen, val_data_gen, num_train_samples, num_val_samples
