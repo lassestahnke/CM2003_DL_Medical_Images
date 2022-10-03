@@ -17,6 +17,7 @@ def train_generator(data_frame,
                     mask_color_mode="grayscale",
                     target_size=(256, 256),
                     binary_mask=True,
+                    num_classes=1,
                     seed=1337):
     image_datagen = ImageDataGenerator(**aug_dict)
     mask_datagen = ImageDataGenerator(**aug_dict)
@@ -49,11 +50,11 @@ def train_generator(data_frame,
 
     # rescale image and masks and return generator
     for (img, mask) in train_gen:
-        img, mask = adjust_data(img, mask, binary_mask)
+        img, mask = adjust_data(img, mask, binary_mask, num_classes=num_classes)
         yield (img, mask)
 
     # scaling of grayscale image and discretizing mask values
-def adjust_data(img, mask, binary_mask=True):
+def adjust_data(img, mask, binary_mask=True, num_classes=1):
     img = img / 255.
 
     # Normalize binary segmentation mask
@@ -65,10 +66,15 @@ def adjust_data(img, mask, binary_mask=True):
     else:
         #t odo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
-        classes = np.unique(mask)
-        print(classes)
+        mask = np.repeat(mask[:, :, :, :, np.newaxis], 3, axis=-1) # todo might remove one colon
+        classes = np.linspace(0, 255, num_classes+1, dtype=int)
+        diff = mask - classes
+        idx = np.argmin(np.abs(diff), axis=-1)
+        idx = idx[:, :, :, :, np.newaxis]
+        mask = mask[:, :, :, :, 0] - np.take_along_axis(diff, idx, axis=-1)[:, :, :, :, 0]
+
         # every foreground class has its own channel
-        shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
+        shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes)-1)
         mask_multiclass = np.zeros(shape) # todo: consider batch size in mask.shape
         for i in range(len(classes)):
             # for multiclass: remove background mask, as it would be 0 anyway
@@ -76,13 +82,13 @@ def adjust_data(img, mask, binary_mask=True):
                 continue
             # set corresponding pixels in channel to 1 if foreground lavel i is present
             mask_class_n = mask * (mask==classes[i]) / classes[i]
-            mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
+            mask_multiclass[:,:,:,i-1] = mask_class_n[:,:,:,0]
 
         return (img, mask_multiclass)
 
 
 def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
-              binary_mask=True):
+              binary_mask=True, num_classes=1):
     """
         Function to load data and return a ImageDataGenerator Object for model training
 
@@ -127,7 +133,8 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                batch_size=batch_size,
                                aug_dict=augmentation_dic,
                                target_size=img_size,
-                               binary_mask=binary_mask
+                               binary_mask=binary_mask,
+                               num_classes=num_classes
                                )
 
     val_data_gen = train_generator(val_data,
@@ -137,6 +144,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                batch_size=batch_size,
                                aug_dict={},
                                target_size=img_size,
-                               binary_mask = binary_mask
+                               binary_mask = binary_mask,
+                               num_classes=num_classes
                                )
     return train_data_gen, val_data_gen, num_train_samples, num_val_samples
