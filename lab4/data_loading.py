@@ -66,12 +66,12 @@ def adjust_data(img, mask, binary_mask=True, num_classes=1):
     else:
         #t odo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
-        mask = np.repeat(mask[:, :, :, :, np.newaxis], 3, axis=-1) # todo might remove one colon
-        classes = np.linspace(0, 255, num_classes+1, dtype=int)
-        diff = mask - classes
-        idx = np.argmin(np.abs(diff), axis=-1)
+        mask = np.repeat(mask[:, :, :, :, np.newaxis], num_classes+1, axis=-1) # expand mask on last dimension
+        classes = np.linspace(0, 255, num_classes+1, dtype=int) # find grayscale values of classes
+        diff = mask - classes                         # calculate the distance between class grayscale values and image
+        idx = np.argmin(np.abs(diff), axis=-1)    # find indices of the smallest distance to class grayscale value
         idx = idx[:, :, :, :, np.newaxis]
-        mask = mask[:, :, :, :, 0] - np.take_along_axis(diff, idx, axis=-1)[:, :, :, :, 0]
+        mask = mask[:, :, :, :, 0] - np.take_along_axis(diff, idx, axis=-1)[:, :, :, :, 0] # recover mask based on idx
 
         # every foreground class has its own channel
         shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes)-1)
