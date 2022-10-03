@@ -2,8 +2,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def learning_curves(history, loss_key, validation_loss_key, metric_keys, validation_metric_keys,
-                    loss_range=(0,1), metric_range=(0,1)):
+                    loss_range=(0, 1), metric_range=(0, 1)):
     """
         Function to plot learning curves.
 
@@ -18,8 +19,8 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
     """
     plt.figure(figsize=(4, 4))
     plt.title("Learning curve")
-    plt.plot(history.history[loss_key], label=loss_key) #loss is training loss
-    plt.plot(history.history[validation_loss_key], label=validation_loss_key) #val_loss is validation loss
+    plt.plot(history.history[loss_key], label=loss_key)  # loss is training loss
+    plt.plot(history.history[validation_loss_key], label=validation_loss_key)  # val_loss is validation loss
     plt.plot(np.argmin(history.history[validation_loss_key]),
              np.min(history.history[validation_loss_key]), marker="x", color="r", label="best model")
     plt.xlabel("Epochs")
@@ -31,18 +32,17 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
     print(history.history.keys())
 
     for i in range(len(metric_keys)):
-        print(metric_keys)
+        print(metric_keys[i])
         print(metric_keys[i], history.history[metric_keys[i]][-1])
         print(validation_metric_keys[i], history.history[validation_metric_keys[i]][-1])
-
 
     # plotting metric curves
     for met in metric_keys:
         print(met)
         plt.figure(figsize=(4, 4))
         plt.title("Learning curve")
-        plt.plot(history.history[met], label=met) # training accuracy
-        plt.plot(history.history[met], label=met) # validation accuracy
+        plt.plot(history.history[met], label=met)  # training accuracy
+        plt.plot(history.history[met], label=met)  # validation accuracy
         plt.xlabel("Epochs")
         plt.ylabel(met)
         plt.ylim(metric_range)
@@ -50,8 +50,8 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
         plt.show()
     return
 
-def sample_segmentation(data_loader,n_samples=1, model=None):
 
+def sample_segmentation(data_loader, n_samples=1, model=None):
     for i in range(n_samples):
         img, msk = next(data_loader)
 
@@ -65,7 +65,8 @@ def sample_segmentation(data_loader,n_samples=1, model=None):
         if model is not None:
             plt.imshow(img[0, :, :, :], cmap="gray")
             pred = model.predict(img)
-            plt.imshow(pred[0,:,:,:])
+            plt.imshow(pred[0, :, :, :], cmap="jet", alpha=0.5)
             plt.title("Prediction")
+            plt.show()
 
     return
