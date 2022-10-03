@@ -19,19 +19,19 @@ if __name__ == '__main__':
     # set model parameters
     img_width = 256
     img_height = 256
-    img_ch = 1
+    img_ch = 3
 
-    n_classes = 3
+    n_classes = 1
     n_base = 8
     batch_size = 8
 
-    epochs = 50
+    epochs = 80
     learning_rate = 0.0001
 
     val_split = 0.2
 
     # set model parameters
-    dropout_rate = 0
+    dropout_rate = 0.2
     use_batch_norm = True
 
     augumentation_dict = dict(rotation_range = 10,
@@ -57,25 +57,27 @@ if __name__ == '__main__':
                             val_split=val_split,
                             batch_size=batch_size,
                             img_size=(img_width, img_height),
-                            augmentation_dic = augumentation_dict,
-                            binary_mask=False)
+                            augmentation_dic = None,
+                            binary_mask=True)
     # define model
-    #unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
-    #unet.summary()
-    #unet.compile(optimizer=Adam(learning_rate=learning_rate),
-    #             loss=dice_loss,
-    #             #loss=tf.keras.losses.BinaryCrossentropy(),
-    #             metrics=[dice_coef, precision, recall])
-    #unet_hist = unet.fit(train_data_loader,
-    #                    epochs=epochs,
-    #                    steps_per_epoch=math.floor(num_train_samples/batch_size),
-    #                    validation_data=val_data_loader,
-    #                    validation_steps=math.floor(num_val_samples/batch_size)
-    #                    )
+    unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
+    unet.summary()
+    unet.compile(optimizer=Adam(learning_rate=learning_rate),
+                 loss=dice_loss,
+                 #loss=tf.keras.losses.BinaryCrossentropy(),
+                 metrics=[dice_coef, precision, recall])
+    unet_hist = unet.fit(train_data_loader,
+                        epochs=epochs,
+                        steps_per_epoch=math.floor(num_train_samples/batch_size),
+                        validation_data=val_data_loader,
+                        validation_steps=math.floor(num_val_samples/batch_size)
+                        )
 
-    #print(unet_hist.history.keys())
-    #learning_curves(unet_hist, "loss", "val_loss", "dice_coef", "val_dice_coef")
-    #unet.save('models/unet_2b_dice')
+    print(unet_hist.history.keys())
+    learning_curves(unet_hist, "loss", "val_loss",
+                    ["dice_coef", "precision", "recall"],
+                    ["val_dice_coef", "val_precision", "val_recall"])
+    unet.save('models/unet_3_dice')
 
     print('finished')
     K.clear_session()

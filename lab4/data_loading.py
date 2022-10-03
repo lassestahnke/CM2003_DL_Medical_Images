@@ -63,7 +63,7 @@ def adjust_data(img, mask, binary_mask=True):
         mask[mask <= 0] = 0
         return (img, mask)
     else:
-        #todo make sure values are rounded after augmentation (can NN interpolation be set?)
+        #t odo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
         classes = np.unique(mask)
         print(classes)
