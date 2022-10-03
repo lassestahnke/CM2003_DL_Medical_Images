@@ -3,8 +3,6 @@ from tensorflow.keras import backend as K
 
 
 def dice_coef(y_true, y_pred, smooth=0):
-    print(y_true.shape)
-    print(y_pred.shape)
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
