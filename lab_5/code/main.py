@@ -13,6 +13,7 @@ import tensorflow as tf
 import math
 from skimage.io import imread
 from tensorflow.keras import backend as K
+from preprocessing import mask_boundaries
 
 if __name__ == '__main__':
     # set model parameters
@@ -51,7 +52,8 @@ if __name__ == '__main__':
 
     # set paths to data
     #base_path = "/DL_course_data/Lab3/X_ray"
-    base_path = "/DL_course_data/Lab3/MRI"
+    #base_path = "/DL_course_data/Lab3/MRI"
+    base_path = "./MRI"
     #base_path = "X_ray"
     #base_path = "CT"
     masks = "Mask"
