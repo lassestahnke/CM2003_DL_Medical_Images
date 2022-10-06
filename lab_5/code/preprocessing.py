@@ -1,5 +1,6 @@
 import SimpleITK as sitk
 import os
+import numpy as np
 def mask_boundaries(path_base, path_mask, path_boundaries):
     """
         Preprocessing function that generates mask boundaries in a seperate folder.
@@ -12,19 +13,28 @@ def mask_boundaries(path_base, path_mask, path_boundaries):
 
     mask_path = os.path.join(path_base, path_mask)
     boundary_path = os.path.join(path_base, path_boundaries)
+    # check if boundary dir exists, if not create it
+    if not os.path.exists(boundary_path):
+        os.makedirs(boundary_path)
 
     masks = os.listdir(mask_path)
     masks.sort()
 
     for m in masks:
-        msk = sitk.ReadImage(os.path.join(mask_path, m), sitk.sitkUInt8)
-        msk /= msk                                      # normalize mask
-        dilated = sitk.BinaryDilate(msk, kernelRadius = (int(2), int(2)))     # compute dilation
-        eroded = sitk.BinaryErode(msk, kernelRadius = (int(2), int(2)) )       # compute erosion
+        msk = sitk.ReadImage(os.path.join(mask_path, m), imageIO="PNGImageIO")
+        vectorRadius = (1, 1)
+        kernel = sitk.sitkBall
+        dilated = sitk.GrayscaleDilate(msk, vectorRadius, kernel)#, kernelRadius = (int(2), int(2)))     # compute dilation
+        eroded = sitk.GrayscaleErode(msk, vectorRadius, kernel)       # compute erosion
         boundary = dilated - eroded                     # compute boundary
         boundary = sitk.Abs(boundary)                   # compute absolute
-        sitk.WriteImage(boundary, os.path.join(boundary_path, m))
+        boundary_full_path = os.path.join(boundary_path, m)
+        print(boundary_full_path)
+        # todo please notmalize images i.e. if val>0: set 1 else 0
 
+        sitk.WriteImage(boundary, boundary_full_path, imageIO="PNGImageIO")
+
+    return sitk.GetArrayFromImage(boundary)
 
 
 
