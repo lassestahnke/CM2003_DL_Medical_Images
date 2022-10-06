@@ -22,20 +22,17 @@ def mask_boundaries(path_base, path_mask, path_boundaries):
 
     for m in masks:
         msk = sitk.ReadImage(os.path.join(mask_path, m), imageIO="PNGImageIO")
-        vectorRadius = (1, 1)
+        vectorRadius = (2, 2)
         kernel = sitk.sitkBall
         dilated = sitk.GrayscaleDilate(msk, vectorRadius, kernel)#, kernelRadius = (int(2), int(2)))     # compute dilation
         eroded = sitk.GrayscaleErode(msk, vectorRadius, kernel)       # compute erosion
         boundary = dilated - eroded                     # compute boundary
         boundary = sitk.Abs(boundary)                   # compute absolute
         boundary_full_path = os.path.join(boundary_path, m)
-        print(boundary_full_path)
-        # todo please notmalize images i.e. if val>0: set 1 else 0
 
         sitk.WriteImage(boundary, boundary_full_path, imageIO="PNGImageIO")
 
-    return sitk.GetArrayFromImage(boundary)
-
+    return
 
 
 

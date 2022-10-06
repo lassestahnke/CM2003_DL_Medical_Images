@@ -3,7 +3,7 @@ import os
 from unet import get_unet
 from metrics import dice_coef, precision, recall
 from analysis import learning_curves
-from loss import dice_loss
+from loss import dice_loss, weighted_loss
 from data_loading import load_data
 from tensorflow.keras import metrics
 from tensorflow.keras.optimizers import Adam
@@ -14,6 +14,9 @@ import math
 from skimage.io import imread
 from tensorflow.keras import backend as K
 from preprocessing import mask_boundaries
+from tensorflow.python.framework.ops import disable_eager_execution
+
+disable_eager_execution()
 
 if __name__ == '__main__':
     # set model parameters
@@ -49,6 +52,8 @@ if __name__ == '__main__':
                               cval = 0)
 
     input_size = (img_width, img_height, img_ch)
+    # options for weightes loss
+    weight_strength = 1
 
     # set paths to data
     #base_path = "/DL_course_data/Lab3/X_ray"
@@ -58,10 +63,14 @@ if __name__ == '__main__':
     #base_path = "CT"
     masks = "Mask"
     img = "Image"
+    boundary = "Boundary"
+
+
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                             img_path=img,
                             target_path=masks,
+                            boundary_path=boundary,
                             val_split=val_split,
                             batch_size=batch_size,
                             img_size=(img_width, img_height),
@@ -75,10 +84,10 @@ if __name__ == '__main__':
     for k in range(cross_val):
         # define model
         print("Training of ", k, "-th fold")
-        unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
+        unet, loss_weights = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
         unet.summary()
         unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                     loss=dice_loss,
+                     loss=weighted_loss(loss_weights, weight_strength),
                      metrics=[dice_coef, precision, recall])
         unet_hist = unet.fit(train_data_loader[k],
                             epochs=epochs,

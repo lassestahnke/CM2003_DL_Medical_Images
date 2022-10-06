@@ -19,6 +19,7 @@ def conv_block(input, filters, use_batch_norm):
 def get_unet(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=False):
     # define input
     input = Input(shape=input_shape)
+    loss_weights = Input(shape=(input_shape[0], input_shape[1], 1), name="loss_weights")
     # define encoder
     # level 1
     level_1_enc = conv_block(input=input, filters=n_base, use_batch_norm=use_batch_norm)
@@ -73,8 +74,8 @@ def get_unet(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=Fals
     else:
         output = Conv2D(n_classes, kernel_size=(1, 1), padding='same', activation='softmax')(level_1_dec)
 
-    model = Model(inputs=input, outputs=output)
-    return model
+    model = Model(inputs=[input, loss_weights] , outputs=output)
+    return model, loss_weights
 
 
 

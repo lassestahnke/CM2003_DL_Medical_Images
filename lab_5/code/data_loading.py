@@ -12,6 +12,7 @@ def train_generator(data_frame,
                     directory,
                     img_path,
                     target_path,
+                    boundary_path,
                     batch_size,
                     aug_dict,
                     image_color_mode="grayscale",
@@ -45,24 +46,52 @@ def train_generator(data_frame,
         order=0,
         seed=seed)
 
+    if boundary_path is not None:
+        boundary_mask_generator = mask_datagen.flow_from_dataframe(
+            data_frame,
+            x_col="mask_list",
+            directory=os.path.join(directory, boundary_path),
+            class_mode=None,
+            color_mode=mask_color_mode,
+            target_size=target_size,
+            batch_size=batch_size,
+            order=0,
+            seed=seed)
+
     # combining both generators into one
-    train_gen = zip(image_generator, mask_generator)
+    if boundary_path is not None:
+        train_gen = zip(image_generator, boundary_mask_generator, mask_generator)
+    else:
+        train_gen = zip(image_generator, mask_generator)
 
     # rescale image and masks and return generator
-    for (img, mask) in train_gen:
-        img, mask = adjust_data(img, mask, binary_mask)
-        yield (img, mask)
+    if boundary_path is not None:
+        for (img, boundary, mask) in train_gen:
+            img, boundary, mask = adjust_data(img, boundary, mask, binary_mask)
+            yield ([img, boundary], mask)
+    else:
+        for (img, mask) in train_gen:
+            img, mask = adjust_data(img, None, mask, binary_mask)
+            yield (img, mask)
 
     # scaling of grayscale image and discretizing mask values
-def adjust_data(img, mask, binary_mask=True):
+def adjust_data(img, boundary, mask, binary_mask=True):
     img = img / 255.
+    # normalize boundary mask
+    if boundary is not None:
+        boundary = boundary / 255.
+        boundary[boundary > 0] = 1
+        boundary[boundary <= 0] = 0
 
     # Normalize binary segmentation mask
     if binary_mask:
         mask = mask / 255.
         mask[mask > 0] = 1
         mask[mask <= 0] = 0
-        return (img, mask)
+        if boundary is not None:
+            return (img, boundary, mask)
+        else:
+            return (img, mask)
     else:
         #t odo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
@@ -78,10 +107,13 @@ def adjust_data(img, mask, binary_mask=True):
             mask_class_n = mask * (mask==classes[i]) / classes[i]
             mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
 
-        return (img, mask_multiclass)
+        if boundary is not None:
+            return (img, boundary, mask_multiclass)
+        else:
+            return (img, mask_multiclass)
 
 
-def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
+def load_data(base_path, img_path, target_path, boundary_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
               binary_mask=True, cross_val=1):
     """
         Function to load data and return a ImageDataGenerator Object for model training
@@ -116,6 +148,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
     # shuffle dataframe
     data = data.sample(frac=1).reset_index(drop=True)
 
+    # todo combine both Cross Val cases into a more concise code
     if cross_val == 1:
         # todo add option to split data based on number of patients instead of number of images
         # split into train and validation set
@@ -123,12 +156,12 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
         num_val_samples = data.shape[0] - num_train_samples
         train_data = data.iloc[:num_train_samples,:]
         val_data = data.iloc[num_train_samples:,:]
-
         # get training generator for images and masks
         train_data_gen = train_generator(train_data,
                                    directory=base_path,
                                    img_path=img_path,
                                    target_path=target_path,
+                                   boundary_path=boundary_path,
                                    batch_size=batch_size,
                                    aug_dict=augmentation_dic,
                                    target_size=img_size,
@@ -139,6 +172,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                    directory=base_path,
                                    img_path=img_path,
                                    target_path=target_path,
+                                   boundary_path=None,
                                    batch_size=batch_size,
                                    aug_dict={},
                                    target_size=img_size,
@@ -168,6 +202,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                              directory=base_path,
                                              img_path=img_path,
                                              target_path=target_path,
+                                             boundary_path=boundary_path,
                                              batch_size=batch_size,
                                              aug_dict=augmentation_dic,
                                              target_size=img_size,
@@ -178,6 +213,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                            directory=base_path,
                                            img_path=img_path,
                                            target_path=target_path,
+                                           boundary_path=boundary_path,
                                            batch_size=batch_size,
                                            aug_dict={},
                                            target_size=img_size,
