@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     n_base = 8
     batch_size = 8
-    epochs = 50
+    epochs = 2
     learning_rate = 0.0001
     val_split = 0.2
 
@@ -111,9 +111,12 @@ if __name__ == '__main__':
                             validation_steps=math.floor(num_val_samples/batch_size)
                             )
         print(unet_hist.history.keys())
+        unet.save('models/unet_lab5_t1_fold{}'.format(k))
+
         learning_curves(unet_hist, "loss", "val_loss",
                         ["dice_coef", "precision", "recall"],
-                        ["val_dice_coef", "val_precision", "val_recall"])
+                        ["val_dice_coef", "val_precision", "val_recall"],
+                        save_path='models/unet_lab5_t1_fold{}'.format(k))
 
         models.append(unet)
         model_histories.append(unet_hist)
