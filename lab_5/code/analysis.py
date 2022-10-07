@@ -1,10 +1,11 @@
 # define function for visualization of learning curves:
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 
 def learning_curves(history, loss_key, validation_loss_key, metric_keys, validation_metric_keys,
-                    loss_range=(0, 1), metric_range=(0, 1)):
+                    loss_range=(0, 1), metric_range=(0, 1), save_path=None):
     """
         Function to plot learning curves.
 
@@ -28,7 +29,13 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
     plt.ylim(loss_range)
 
     plt.legend()
+
+    if save_path is not None:
+        plt.savefig(os.path.join(save_path,"losses.png"))
+
     plt.show()
+
+
     print(history.history.keys())
 
     for i in range(len(metric_keys)):
@@ -47,7 +54,12 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
         plt.ylabel(met)
         plt.ylim(metric_range)
         plt.legend()
+
+        if save_path is not None:
+            plt.savefig(os.path.join(save_path, "{}_metric.png".format(met)))
+
         plt.show()
+
     return
 
 
