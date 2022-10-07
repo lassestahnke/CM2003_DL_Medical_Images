@@ -58,12 +58,14 @@ if __name__ == '__main__':
     # set paths to data
     #base_path = "/DL_course_data/Lab3/X_ray"
     #base_path = "/DL_course_data/Lab3/MRI"
-    base_path = "./MRI"
+    base_path = "..\\..\\MRI"
     #base_path = "X_ray"
     #base_path = "CT"
     masks = "Mask"
     img = "Image"
-    boundary = "Boundary"
+    #boundary = "Boundary"
+    boundary = None
+
 
 
 
@@ -84,11 +86,24 @@ if __name__ == '__main__':
     for k in range(cross_val):
         # define model
         print("Training of ", k, "-th fold")
-        unet, loss_weights = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
+        # unet option for weighted loss with boundaries
+        # unet, loss_weights = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
+        #                               boundary_path=boundary)
+
+        unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
+                                      boundary_path=boundary)
         unet.summary()
+
+        # compile option for weighted loss with boundaries
+        # unet.compile(optimizer=Adam(learning_rate=learning_rate),
+        #              loss=weighted_loss(loss_weights, weight_strength),
+        #              metrics=[dice_coef, precision, recall])
+
+        # compile option for normal dice loss without boundary masks
         unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                     loss=weighted_loss(loss_weights, weight_strength),
+                     loss=dice_loss,
                      metrics=[dice_coef, precision, recall])
+
         unet_hist = unet.fit(train_data_loader[k],
                             epochs=epochs,
                             steps_per_epoch=math.floor(num_train_samples/batch_size),

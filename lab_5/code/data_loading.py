@@ -93,7 +93,7 @@ def adjust_data(img, boundary, mask, binary_mask=True):
         else:
             return (img, mask)
     else:
-        #t odo make sure values are rounded after augmentation (can NN interpolation be set?)
+        #todo make sure values are rounded after augmentation (can NN interpolation be set?)
         # read pixel of individual labels in mask
         classes = np.unique(mask)
         # every foreground class has its own channel
