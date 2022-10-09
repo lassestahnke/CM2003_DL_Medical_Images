@@ -50,7 +50,7 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
         plt.plot(history.history[metric_keys[met]], label=metric_keys[met])  # training accuracy
         plt.plot(history.history[validation_metric_keys[met]], label=validation_metric_keys[met])  # validation accuracy
         plt.xlabel("Epochs")
-        plt.ylabel(met)
+        plt.ylabel(metric_keys[met])
         plt.ylim(metric_range)
         plt.legend()
 
