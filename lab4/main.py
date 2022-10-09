@@ -21,7 +21,7 @@ if __name__ == '__main__':
     img_height = 256
     img_ch = 1
 
-    n_classes = 2 # foreground classes
+    n_classes = 1 # foreground classes
     if n_classes > 1:
         binary_mask=False
     else:
@@ -30,7 +30,7 @@ if __name__ == '__main__':
     n_base = 8
     batch_size = 8
 
-    epochs = 80
+    epochs = 2
     learning_rate = 0.0001
 
     val_split = 0.2
@@ -53,7 +53,8 @@ if __name__ == '__main__':
     #base_path = "/DL_course_data/Lab3/X_ray"
     #base_path = "/DL_course_data/Lab3/CT"
     #base_path = "X_ray"
-    base_path = "CT"
+    base_path = "..\\CT"
+    #base_path = "CT"
     masks = "Mask"
     img = "Image"
 
@@ -63,7 +64,7 @@ if __name__ == '__main__':
                             val_split=val_split,
                             batch_size=batch_size,
                             img_size=(img_width, img_height),
-                            augmentation_dic = augumentation_dict,
+                            augmentation_dic = None,
                             binary_mask=binary_mask,
                             num_classes=n_classes)
     # define model
@@ -81,10 +82,12 @@ if __name__ == '__main__':
                         )
 
     print(unet_hist.history.keys())
+    unet.save('models/unet_2a_dice_no_aug')
+
     learning_curves(unet_hist, "loss", "val_loss",
                     ["dice_coef", "precision", "recall"],
-                    ["val_dice_coef", "val_precision", "val_recall"])
-    unet.save('models/unet_3_dice')
+                    ["val_dice_coef", "val_precision", "val_recall"],
+                    save_path='models/unet_2a_dice_no_aug')
 
     print('finished')
     K.clear_session()
