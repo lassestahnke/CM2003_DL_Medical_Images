@@ -1,8 +1,10 @@
 from metrics import dice_coef
 import tensorflow.keras.backend as K
 
+
 def dice_loss(y_true, y_pred):
     return 1 - dice_coef(y_true, y_pred)
+
 
 def weighted_loss(weight_map, weight_strength):
     def weighted_dice_loss(y_true, y_pred):

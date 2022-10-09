@@ -15,6 +15,7 @@ from skimage.io import imread
 from tensorflow.keras import backend as K
 from preprocessing import mask_boundaries
 from tensorflow.python.framework.ops import disable_eager_execution
+# from numba import cuda
 
 disable_eager_execution()
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
 
     n_base = 8
     batch_size = 8
-    epochs = 2
+    epochs = 100
     learning_rate = 0.0001
     val_split = 0.2
 
@@ -52,22 +53,19 @@ if __name__ == '__main__':
                               cval = 0)
 
     input_size = (img_width, img_height, img_ch)
-    # options for weightes loss
+    # options for weights loss
     weight_strength = 1
 
     # set paths to data
-    #base_path = "/DL_course_data/Lab3/X_ray"
-    #base_path = "/DL_course_data/Lab3/MRI"
+    # base_path = "/DL_course_data/Lab3/X_ray"
+    # base_path = "/DL_course_data/Lab3/MRI"
     base_path = "..\\..\\MRI"
-    #base_path = "X_ray"
-    #base_path = "CT"
+    # base_path = "X_ray"
+    # base_path = "CT"
     masks = "Mask"
     img = "Image"
-    #boundary = "Boundary"
+    # boundary = "Boundary"
     boundary = None
-
-
-
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                             img_path=img,
@@ -91,7 +89,7 @@ if __name__ == '__main__':
         #                               boundary_path=boundary)
 
         unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
-                                      boundary_path=boundary)
+                        boundary_path=boundary)
         unet.summary()
 
         # compile option for weighted loss with boundaries

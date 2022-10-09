@@ -105,7 +105,7 @@ def adjust_data(img, boundary, mask, binary_mask=True):
                 continue
             # set corresponding pixels in channel to 1 if foreground lavel i is present
             mask_class_n = mask * (mask==classes[i]) / classes[i]
-            mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
+            mask_multiclass[:, :, :, i] = mask_class_n[:, :, :, 0]
 
         if boundary is not None:
             return (img, boundary, mask_multiclass)
@@ -154,8 +154,8 @@ def load_data(base_path, img_path, target_path, boundary_path, img_size=(256, 25
         # split into train and validation set
         num_train_samples = int(data.shape[0] * (1-val_split))
         num_val_samples = data.shape[0] - num_train_samples
-        train_data = data.iloc[:num_train_samples,:]
-        val_data = data.iloc[num_train_samples:,:]
+        train_data = data.iloc[:num_train_samples, :]
+        val_data = data.iloc[num_train_samples:, :]
         # get training generator for images and masks
         train_data_gen = train_generator(train_data,
                                    directory=base_path,
@@ -182,14 +182,14 @@ def load_data(base_path, img_path, target_path, boundary_path, img_size=(256, 25
 
     if cross_val > 1:
         chunk_size = math.floor(len(data)/cross_val)
-        train_gens = [] # set list of train_generators
-        val_gens = [] # set list of validation generators
+        train_gens = []  # set list of train_generators
+        val_gens = []  # set list of validation generators
 
         num_train_samples = (cross_val-1) * chunk_size
         num_val_samples = chunk_size
 
         for k in range(cross_val):
-            idx=np.arange(len(data))
+            idx = np.arange(len(data))
             mask_train = np.ones(len(idx), dtype=bool)
             mask_train[k*chunk_size:(k+1)*chunk_size] = False
             mask_val = (mask_train == False)

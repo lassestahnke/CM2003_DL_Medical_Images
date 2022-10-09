@@ -1,6 +1,8 @@
 import SimpleITK as sitk
 import os
 import numpy as np
+
+
 def mask_boundaries(path_base, path_mask, path_boundaries):
     """
         Preprocessing function that generates mask boundaries in a seperate folder.
@@ -24,10 +26,10 @@ def mask_boundaries(path_base, path_mask, path_boundaries):
         msk = sitk.ReadImage(os.path.join(mask_path, m), imageIO="PNGImageIO")
         vectorRadius = (2, 2)
         kernel = sitk.sitkBall
-        dilated = sitk.GrayscaleDilate(msk, vectorRadius, kernel)#, kernelRadius = (int(2), int(2)))     # compute dilation
+        dilated = sitk.GrayscaleDilate(msk, vectorRadius, kernel)  # kernelRadius = (int(2), int(2))) # compute dilation
         eroded = sitk.GrayscaleErode(msk, vectorRadius, kernel)       # compute erosion
-        boundary = dilated - eroded                     # compute boundary
-        boundary = sitk.Abs(boundary)                   # compute absolute
+        boundary = dilated - eroded                                   # compute boundary
+        boundary = sitk.Abs(boundary)                                 # compute absolute
         boundary_full_path = os.path.join(boundary_path, m)
 
         sitk.WriteImage(boundary, boundary_full_path, imageIO="PNGImageIO")
