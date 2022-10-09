@@ -35,7 +35,6 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
 
     plt.show()
 
-
     print(history.history.keys())
 
     for i in range(len(metric_keys)):
@@ -44,19 +43,19 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
         print(validation_metric_keys[i], history.history[validation_metric_keys[i]][-1])
 
     # plotting metric curves
-    for met in metric_keys:
-        print(met)
+    for met in range(len(metric_keys)):
+        print(metric_keys[met])
         plt.figure(figsize=(4, 4))
         plt.title("Learning curve")
-        plt.plot(history.history[met], label=met)  # training accuracy
-        plt.plot(history.history[met], label=met)  # validation accuracy
+        plt.plot(history.history[metric_keys[met]], label=metric_keys[met])  # training accuracy
+        plt.plot(history.history[validation_metric_keys[met]], label=validation_metric_keys[met])  # validation accuracy
         plt.xlabel("Epochs")
         plt.ylabel(met)
         plt.ylim(metric_range)
         plt.legend()
 
         if save_path is not None:
-            plt.savefig(os.path.join(save_path, "{}_metric.png".format(met)))
+            plt.savefig(os.path.join(save_path, "{}_metric.png".format(metric_keys[met])))
 
         plt.show()
 
