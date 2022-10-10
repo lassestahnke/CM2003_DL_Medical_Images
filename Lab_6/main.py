@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 from lstm import get_LSTM
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import backend as K
+from analysis import learning_curves
 
 # load csv files:
 dataset_train = pd.read_csv('/DL_course_data/Lab5/train_data_stock.csv')
@@ -54,10 +56,18 @@ n_units = 20
 model = get_LSTM(batch_size, timesteps, n_units, dropout_rate)
 model.compile(loss='mean_squared_error',
               optimizer=Adam(learning_rate=learning_rate),
-              metrics='mean_absolute_error')
-
-model.fit(x=X_train,
-          y=y_train,
-          validation_data=(X_val, y_val),
-          epochs=100,
+              metrics=['mean_absolute_error'])
+model.summary()
+model_hist = model.fit(x=X_train,
+                       y=y_train,
+                       batch_size=batch_size,
+                       validation_data=(X_val, y_val),
+                       epochs=100,
           )
+
+learning_curves(model_hist, loss_key='loss',
+                validation_loss_key='val_loss',
+                metric_keys=['mean_absolute_error'],
+                validation_metric_keys=['val_mean_absolute_error'])
+
+K.clear_session()
