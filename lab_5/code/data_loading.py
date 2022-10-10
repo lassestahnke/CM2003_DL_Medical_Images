@@ -172,13 +172,13 @@ def load_data(base_path, img_path, target_path, boundary_path, img_size=(256, 25
                                    directory=base_path,
                                    img_path=img_path,
                                    target_path=target_path,
-                                   boundary_path=None,
+                                   boundary_path=boundary_path,
                                    batch_size=batch_size,
                                    aug_dict={},
                                    target_size=img_size,
                                    binary_mask = binary_mask
                                    )
-        return train_data_gen, val_data_gen, num_train_samples, num_val_samples
+        return [train_data_gen], [val_data_gen], num_train_samples, num_val_samples
 
     if cross_val > 1:
         chunk_size = math.floor(len(data)/cross_val)

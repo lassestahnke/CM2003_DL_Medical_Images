@@ -15,7 +15,6 @@ from skimage.io import imread
 from tensorflow.keras import backend as K
 from preprocessing import mask_boundaries
 from tensorflow.python.framework.ops import disable_eager_execution
-# from numba import cuda
 
 disable_eager_execution()
 
@@ -33,7 +32,7 @@ if __name__ == '__main__':
 
     n_base = 8
     batch_size = 8
-    epochs = 100
+    epochs = 50
     learning_rate = 0.0001
     val_split = 0.2
 
@@ -42,7 +41,7 @@ if __name__ == '__main__':
     use_batch_norm = True
 
     # use cross-validation:
-    cross_val = 3
+    cross_val = 1
 
     augumentation_dict = dict(rotation_range = 10,
                               width_shift_range = 0.1,
@@ -53,19 +52,22 @@ if __name__ == '__main__':
                               cval = 0)
 
     input_size = (img_width, img_height, img_ch)
-    # options for weights loss
-    weight_strength = 1
+    # options for weightes loss
+    weight_strength = 0.5
 
     # set paths to data
-    # base_path = "/DL_course_data/Lab3/X_ray"
-    # base_path = "/DL_course_data/Lab3/MRI"
-    base_path = "..\\..\\MRI"
-    # base_path = "X_ray"
-    # base_path = "CT"
+    #base_path = "/DL_course_data/Lab3/X_ray"
+    #base_path = "/DL_course_data/Lab3/MRI"
+    base_path = "MRI"
+    #base_path = "X_ray"
+    #base_path = "CT"
     masks = "Mask"
     img = "Image"
-    # boundary = "Boundary"
+    #boundary = "Boundary"
     boundary = None
+
+
+
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                             img_path=img,
@@ -85,22 +87,22 @@ if __name__ == '__main__':
         # define model
         print("Training of ", k, "-th fold")
         # unet option for weighted loss with boundaries
-        # unet, loss_weights = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
-        #                               boundary_path=boundary)
-
-        unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
-                        boundary_path=boundary)
-        unet.summary()
-
-        # compile option for weighted loss with boundaries
-        # unet.compile(optimizer=Adam(learning_rate=learning_rate),
-        #              loss=weighted_loss(loss_weights, weight_strength),
-        #              metrics=[dice_coef, precision, recall])
-
-        # compile option for normal dice loss without boundary masks
-        unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                     loss=dice_loss,
-                     metrics=[dice_coef, precision, recall])
+        if boundary is not None:
+            unet, loss_weights = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
+                                          boundary_path=boundary)
+            unet.summary()
+            # compile option for weighted loss with boundaries
+            unet.compile(optimizer=Adam(learning_rate=learning_rate),
+                         loss=weighted_loss(loss_weights, weight_strength),
+                         metrics=[dice_coef, precision, recall])
+        else:
+            unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2,
+                            boundary_path=boundary)
+            unet.summary()
+            # compile option for normal dice loss without boundary masks
+            unet.compile(optimizer=Adam(learning_rate=learning_rate),
+                         loss=dice_loss,
+                         metrics=[dice_coef, precision, recall])
 
         unet_hist = unet.fit(train_data_loader[k],
                             epochs=epochs,
@@ -109,12 +111,12 @@ if __name__ == '__main__':
                             validation_steps=math.floor(num_val_samples/batch_size)
                             )
         print(unet_hist.history.keys())
-        unet.save('models/unet_lab5_t1_fold{}'.format(k))
+        unet.save('models/unet_lab5_wo_bound_fold{}'.format(k))
 
         learning_curves(unet_hist, "loss", "val_loss",
                         ["dice_coef", "precision", "recall"],
                         ["val_dice_coef", "val_precision", "val_recall"],
-                        save_path='models/unet_lab5_t1_fold{}'.format(k))
+                        save_path='models/unet_lab5_wo_bound_fold{}'.format(k))
 
         models.append(unet)
         model_histories.append(unet_hist)
