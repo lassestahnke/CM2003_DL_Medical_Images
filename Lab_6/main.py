@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-
+from lstm import get_LSTM
+from tensorflow.keras.optimizers import Adam
 
 # load csv files:
 dataset_train = pd.read_csv('/DL_course_data/Lab5/train_data_stock.csv')
@@ -42,3 +43,21 @@ y_val = sc.transform(val_set)
 # reshape to 3D array (format needed by LSTMs -> number of samples, timesteps, input dimension)
 X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], 1))
+
+# model training
+batch_size = 16
+dropout_rate = 0.2
+learning_rate = 10e-4
+timesteps = T
+n_units = 20
+
+model = get_LSTM(batch_size, timesteps, n_units, dropout_rate)
+model.compile(loss='mean_squared_error',
+              optimizer=Adam(learning_rate=learning_rate),
+              metrics='mean_absolute_error')
+
+model.fit(x=X_train,
+          y=y_train,
+          validation_data=(X_val, y_val),
+          epochs=100,
+          )
