@@ -25,8 +25,8 @@ T = 60
 X_train = []
 y_train = []
 for i in range(T, len(training_set)):
-X_train.append(training_set_scaled[i-T:i, 0])
-y_train.append(training_set_scaled[i, 0])
+    X_train.append(training_set_scaled[i-T:i, 0])
+    y_train.append(training_set_scaled[i, 0])
 X_train, y_train = np.array(X_train), np.array(y_train)
 # normalize the validation set according to the normalization applied to the training set:
 inputs = dataset_total[len(dataset_total) - len(dataset_val) - 60:].values
@@ -35,7 +35,8 @@ inputs = sc.transform(inputs)
 # split validation data into T time steps:
 X_val = []
 
-for i in range(T, T + len(val_set)): X_val.append(inputs[i-T:i, 0])
+for i in range(T, T + len(val_set)):
+    X_val.append(inputs[i-T:i, 0])
 X_val = np.array(X_val)
 y_val = sc.transform(val_set)
 # reshape to 3D array (format needed by LSTMs -> number of samples, timesteps, input dimension)
