@@ -50,9 +50,9 @@ X_val = np.reshape(X_val, (X_val.shape[0], X_val.shape[1], 1))
 # model training
 batch_size = 16
 dropout_rate = 0.2
-learning_rate = 10e-3
+learning_rate = 0.001
 timesteps = T
-n_units = 100
+n_units = 20
 
 model = get_LSTM(batch_size, timesteps, n_units, dropout_rate)
 model.compile(loss='mean_squared_error',
@@ -69,14 +69,16 @@ model_hist = model.fit(x=X_train,
 learning_curves(model_hist, loss_key='loss',
                 validation_loss_key='val_loss',
                 metric_keys=['mean_absolute_error'],
-                validation_metric_keys=['val_mean_absolute_error'])
+                validation_metric_keys=['val_mean_absolute_error'],
+                loss_range=(0, 0.05), metric_range=(0,0.2))
 
 predicted_stock_price = model.predict(X_val)
 predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 y_val_scale = sc.inverse_transform(y_val)
 
-plt.plot(y_val_scale)
-plt.plot(predicted_stock_price)
+plt.plot(y_val_scale,  label="ground truth")
+plt.plot(predicted_stock_price, label="prediction")
+plt.legend()
 plt.show()
 
 K.clear_session()
