@@ -1,5 +1,5 @@
 # file to define network architecture of LSTM
-from tensorflow.keras.layers import LSTM, Dropout, Dense, Input, Embedding
+from tensorflow.keras.layers import LSTM, Dropout, Dense, Input, Embedding, Bidirectional, InputLayer
 from tensorflow.keras.models import Sequential
 
 def get_LSTM(batch_size, look_back, n_units, do_rate=0):
