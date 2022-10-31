@@ -1,0 +1,12 @@
+Test Set Evaluation
+
+Note that the following needs to be taken into account when preparing the prediction files:
+- Predictions should be a PNG file as 2D maps containing artery and vein classes with size (768,768) [submitting maps with size (768,768,3) will trigger an error in evaluation).
+- Artery and vein classes should have labels of 128 and 256 respectively. Background should have a label of 0.
+- The filenames must exactly match the name of the images in the test set [IR_Case_006.png, ..., IR_Case_060.png].
+
+Once segmentation outputs are obtained in the correct format, participants should place the them in a folder named
+"test" and submit a zipped version of this folder to the server.
+
+The Dice and Jaccard scores will be calculated for every image in the test set for both artery and vein classes.
+The leaderbord is sorted on the basis of the best average Dice score.
