@@ -21,13 +21,12 @@ import numpy as np
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
-    #base_path = "/DL_course_data/Lab3/X_ray"
-    #base_path = "/DL_course_data/Lab3/CT"
-    #base_path = "X_ray"
+    # base_path = "/DL_course_data/Lab3/X_ray"
+    # base_path = "/DL_course_data/Lab3/CT"
+    # base_path = "X_ray"
     base_path = "/home/student//tf-lasse/project/dataset/train"
     masks = "training_masks"
     img = "training_images"
-
 
     # set model parameters
     img_width = 768
@@ -37,9 +36,9 @@ if __name__ == '__main__':
     # set number of foreground classes
     n_classes = 2
     if n_classes > 1:
-        binary_mask=False
+        binary_mask = False
     else:
-        binary_mask=True
+        binary_mask = True
 
     # set batch size
     batch_size = 4
@@ -72,7 +71,7 @@ if __name__ == '__main__':
     # grid search settings
     n_exp = 0
     grd_srch_n_base = [16, 32, 64]
-    kernel_size = [(3,3), (5,5)]
+    kernel_size = [(3, 3), (5, 5)]
     learning_rate = [0.001, 0.0001, 0.00001]
     alphas = np.array([1, 0.8, 0.6, 0.4])
 
@@ -92,11 +91,11 @@ if __name__ == '__main__':
                                  loss=combined_loss(alpha=alpha),
                                  metrics=[dice_coef, precision, recall, jaccard])
                     unet_hist = unet.fit(train_data_loader[0],
-                                        epochs=epochs,
-                                        steps_per_epoch=math.floor(num_train_samples/batch_size),
-                                        validation_data=val_data_loader[0],
-                                        validation_steps=math.floor(num_val_samples/batch_size),
-                                        )
+                                         epochs=epochs,
+                                         steps_per_epoch=math.floor(num_train_samples/batch_size),
+                                         validation_data=val_data_loader[0],
+                                         validation_steps=math.floor(num_val_samples/batch_size),
+                                         )
 
                     # print model history keys
                     print(unet_hist.history.keys())
@@ -132,8 +131,3 @@ if __name__ == '__main__':
 
 
     K.clear_session()
-
-
-
-
-
