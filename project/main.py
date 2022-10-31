@@ -2,7 +2,7 @@
 import os
 
 from unet import get_unet
-from metrics import dice_coef, precision, recall
+from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves
 from loss import dice_loss, combined_loss
 from dataloading import load_data
@@ -14,6 +14,9 @@ import tensorflow as tf
 import math
 from skimage.io import imread
 from tensorflow.keras import backend as K
+import json
+import open
+import numpy as np
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
@@ -81,11 +84,8 @@ if __name__ == '__main__':
     unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
     unet.summary()
     unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 loss=combined_loss,
-                 #loss=dice_loss,
-                 #loss_weights=[0.5, 0.5],
-                 #loss=tf.keras.losses.BinaryCrossentropy(),
-                 metrics=[dice_coef, precision, recall])
+                 loss=combined_loss(w_dsc=w_dsc, w_bce=w_bce),
+                 metrics=[dice_coef, precision, recall, jaccard])
     unet_hist = unet.fit(train_data_loader[0],
                         epochs=epochs,
                         steps_per_epoch=math.floor(num_train_samples/batch_size),
@@ -105,8 +105,7 @@ if __name__ == '__main__':
                     ["val_dice_coef", "val_precision", "val_recall"],
                     save_path='models/unet_test')
 
-    # code run finished debug
-    print('finished')
+
 
     K.clear_session()
 
