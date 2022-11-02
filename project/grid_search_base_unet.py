@@ -25,10 +25,7 @@ tf.config.gpu.set_per_process_memory_growth(True)
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
-    # base_path = "/DL_course_data/Lab3/X_ray"
-    # base_path = "/DL_course_data/Lab3/CT"
-    # base_path = "X_ray"
-    base_path = "/home/student//tf-lasse/project/dataset/train"
+    base_path = "/home/student/tf-lasse/project/dataset/train"
     masks = "training_masks"
     img = "training_images"
 
@@ -70,7 +67,11 @@ if __name__ == '__main__':
                                                                                        img_size=(img_width, img_height),
                                                                                        augmentation_dic=None,
                                                                                        binary_mask=binary_mask,
-                                                                                       num_classes=n_classes)
+                                                                                       num_classes=n_classes,
+                                                                                       patch_size=(256,256))
+
+    print(next(train_data_loader[0])[0].shape)
+    print(next(val_data_loader[0])[0].shape)
 
     # grid search settings
     n_exp = 0
@@ -79,19 +80,21 @@ if __name__ == '__main__':
     learning_rate = [0.001, 0.0001, 0.00001]
     alphas = np.array([1, 0.8, 0.6, 0.4])
 
+
+
     for n_base in grd_srch_n_base:
         for kernel in kernel_size:
             for lr in learning_rate:
                 for alpha in alphas:
 
                     # define model
-                    unet = get_unet(input_shape=input_size,
+                    unet = get_unet(input_shape=(None,None,1),
                                     n_classes=n_classes,
                                     n_base=n_base,
                                     dropout_rate=0.2,
                                     kernel_size=kernel)
                     unet.summary()
-                    unet.compile(optimizer=Adam(learning_rate=learning_rate),
+                    unet.compile(optimizer=Adam(learning_rate=lr),
                                  loss=combined_loss(alpha=alpha),
                                  metrics=[dice_coef, precision, recall, jaccard])
                     unet_hist = unet.fit(train_data_loader[0],

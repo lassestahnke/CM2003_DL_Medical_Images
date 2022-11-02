@@ -4,6 +4,10 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
+import random
+
+
+
 
 
 # following function is adopted from https://www.kaggle.com/code/lqdisme/brain-mri-segmentation-unet-keras
@@ -18,7 +22,9 @@ def train_generator(data_frame,
                     target_size=(256, 256),
                     binary_mask=True,
                     num_classes=1,
-                    seed=1337):
+                    seed=1337,
+                    patch_size = None
+                    ):
     """
     Function to create instances of ImageDataGenerator for loading and augmenting images
 
