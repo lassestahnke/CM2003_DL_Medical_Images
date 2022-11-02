@@ -14,9 +14,6 @@ import tensorflow as tf
 import math
 from skimage.io import imread
 from tensorflow.keras import backend as K
-import json
-import open
-import numpy as np
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
@@ -84,7 +81,7 @@ if __name__ == '__main__':
     unet = get_unet(input_shape=input_size, n_classes=n_classes, n_base=n_base, dropout_rate=0.2)
     unet.summary()
     unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 loss=combined_loss(w_dsc=w_dsc, w_bce=w_bce),
+                 loss=combined_loss(0.7),
                  metrics=[dice_coef, precision, recall, jaccard])
     unet_hist = unet.fit(train_data_loader[0],
                         epochs=epochs,

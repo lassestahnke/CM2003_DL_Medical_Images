@@ -15,8 +15,10 @@ import math
 from skimage.io import imread
 from tensorflow.keras import backend as K
 import json
-import open
 import numpy as np
+
+gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+tf.config.experimental.set_memory_growth(gpu_devices[0], True)
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set number of epochs
-    epochs = 1000
+    epochs = 50
 
     # set learning rate
     learning_rate = 0.0001
@@ -95,6 +97,7 @@ if __name__ == '__main__':
                                          steps_per_epoch=math.floor(num_train_samples/batch_size),
                                          validation_data=val_data_loader[0],
                                          validation_steps=math.floor(num_val_samples/batch_size),
+                                         use_multiprocessing=True,
                                          )
 
                     # print model history keys
@@ -106,28 +109,30 @@ if __name__ == '__main__':
 
                     params = {
                         "n_base": n_base,
-                        "learning_rate": learning_rate,
+                        "learning_rate": lr,
                         "alpha": alpha,
                         "kernel_size": kernel,
                         "augmentation": "None",
                         "epochs": epochs,
-                        "loss": unet_hist.history("loss"),
-                        "val_loss": unet_hist.history("val_loss"),
-                        "dice_coef": unet_hist.history("dice_coef"),
-                        "val_dice_coef": unet_hist.history("val_dice_coef"),
-                        "precision": unet_hist.history("precision"),
-                        "val_precision": unet_hist.history("val_precision"),
-                        "recall": unet_hist.history("recall"),
-                        "val_recall": unet_hist.history("val_recall")
+                        "loss": np.array(unet_hist.history["loss"][-5:]).sum()/5,
+                        "val_loss": np.array(unet_hist.history["val_loss"][-5:]).sum()/5,
+                        "dice_coef": np.array(unet_hist.history["dice_coef"][-5:]).sum()/5,
+                        "val_dice_coef": np.array(unet_hist.history["val_dice_coef"][-5:]).sum()/5,
+                        "precision": np.array(unet_hist.history["precision"][-5:]).sum()/5,
+                        "val_precision": np.array(unet_hist.history["val_precision"][-5:]).sum()/5,
+                        "recall": np.array(unet_hist.history["recall"][-5:]).sum()/5,
+                        "val_recall": np.array(unet_hist.history["val_recall"][-5:]).sum()/5,
+                        "jaccard": np.array(unet_hist.history["jaccard"][-5:]).sum() / 5,
+                        "val_jaccard": np.array(unet_hist.history["val_jaccard"][-5:]).sum() / 5
                     }
 
-
+                    print(params)
                     with open(os.path.join(json_path, json_file_name), "w") as outfile:
-                        json.dumps(params, outfile)
+                        json.dump(params, outfile)
                         
                     # code run finished debug
                     print('finished experiment ', n_exp)
                     n_exp += 1
+                    K.clear_session()
 
 
-    K.clear_session()

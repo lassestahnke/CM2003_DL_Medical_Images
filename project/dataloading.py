@@ -72,6 +72,13 @@ def train_generator(data_frame,
     # rescale image and masks and return generator
     for (img, mask) in train_gen:
         img, mask = adjust_data(img, mask, binary_mask, num_classes=num_classes)
+        # draw patches
+        if patch_size is not None:
+            # draw indices that keep patch within image
+            idx_w = random.randint(0, target_size[0] - patch_size[0])
+            idx_h = random.randint(0, target_size[1] - patch_size[1])
+            img = img[:,idx_w:idx_w + patch_size[0], idx_h:idx_h + patch_size[1],:]
+            mask = mask[:,idx_w:idx_w + patch_size[0], idx_h:idx_h + patch_size[1],:]
         yield (img, mask)
 
     # scaling of grayscale image and discretising mask values
@@ -107,7 +114,7 @@ def adjust_data(img, mask, binary_mask=True, num_classes=1):
         return (img, mask_multiclass)
 
 
-def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0.0, batch_size=8, augmentation_dic=None,
+def load_data(base_path, img_path, target_path, img_size=(256, 256), patch_size=None,  val_split=0.0, batch_size=8, augmentation_dic=None,
               binary_mask=True, cross_val=1, num_classes=1):
     """
     Function to load data and return a ImageDataGenerator Object for model training
@@ -117,6 +124,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
         img_path: [string] Name of image directory.
         target_path: [string] Name of mask directory.
         img_size: [tuple] size of image. (img_width, img_height, img_channel).
+        patch_size: [tuple] size of patches (patch_width, patch_height), if None: patch_size=img_size
         val_split: [float] split of data; relative number of validation data; between 0 and 1;
                             only used for cross val = 1
         batch_size: [int] Number of samples per batch.
@@ -159,7 +167,8 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                          aug_dict=augmentation_dic,
                                          target_size=img_size,
                                          binary_mask=binary_mask,
-                                         num_classes=num_classes
+                                         num_classes=num_classes,
+                                         patch_size=patch_size
                                          )
 
 
@@ -171,7 +180,8 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), val_split=0
                                        aug_dict={},
                                        target_size=img_size,
                                        binary_mask = binary_mask,
-                                       num_classes=num_classes
+                                       num_classes=num_classes,
+                                       patch_size=None
                                        )
         return [train_data_gen], [val_data_gen], num_train_samples, num_val_samples
 
