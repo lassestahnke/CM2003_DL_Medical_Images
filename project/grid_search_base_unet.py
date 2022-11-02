@@ -17,8 +17,10 @@ from tensorflow.keras import backend as K
 import json
 import numpy as np
 
-gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-tf.config.experimental.set_memory_growth(gpu_devices[0], True)
+#gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+#gpu_device = tf.test.gpu_device_name()
+#tf.config.experimental.set_memory_growth(gpu_device, True)
+tf.config.gpu.set_per_process_memory_growth(True)
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
@@ -97,7 +99,8 @@ if __name__ == '__main__':
                                          steps_per_epoch=math.floor(num_train_samples/batch_size),
                                          validation_data=val_data_loader[0],
                                          validation_steps=math.floor(num_val_samples/batch_size),
-                                         use_multiprocessing=True,
+                                         use_multiprocessing=False,
+                                         workers = 1,
                                          )
 
                     # print model history keys
