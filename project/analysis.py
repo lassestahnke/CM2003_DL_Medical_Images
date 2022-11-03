@@ -1,7 +1,11 @@
 # define function for visualization of learning curves:
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+
+import pandas as pd
 
 
 def learning_curves(history, loss_key, validation_loss_key, metric_keys, validation_metric_keys,
@@ -81,3 +85,22 @@ def sample_segmentation(data_loader, n_samples=1, model=None):
             plt.show()
 
     return
+
+
+def read_grid_search_json(path, sort_by="val_dice_coef"):
+    """
+    File to read .json files in folder, convert them to dict and wrap them into one pandas Dataframe
+    args: path [str]: path to directory
+    """
+    data_frame = pd.DataFrame()
+    for file in os.listdir(path):
+        if not file.endswith(".json"):
+            continue
+
+        with open(os.path.join(path, file), "r") as file_read:
+            print(file_read.name)
+            dic = json.load(file_read)
+            data_frame = data_frame.append(dic, ignore_index=True)
+
+    return data_frame.sort_values(sort_by, ascending=False)
+

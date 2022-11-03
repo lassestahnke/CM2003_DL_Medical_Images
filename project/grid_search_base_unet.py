@@ -20,12 +20,13 @@ import numpy as np
 #gpu_devices = tf.config.experimental.list_physical_devices('GPU')
 #gpu_device = tf.test.gpu_device_name()
 #tf.config.experimental.set_memory_growth(gpu_device, True)
-tf.config.gpu.set_per_process_memory_growth(True)
+#tf.config.gpu.set_per_process_memory_growth(True)
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
-    base_path = "/home/student/tf-lasse/project/dataset/train"
+    #base_path = "/home/student/tf-lasse/project/dataset/train"
+    base_path = "../project/dataset/train"
     masks = "training_masks"
     img = "training_images"
 
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set number of epochs
-    epochs = 50
+    epochs = 700
 
     # set learning rate
     learning_rate = 0.0001
@@ -76,7 +77,8 @@ if __name__ == '__main__':
     # grid search settings
     n_exp = 0
     grd_srch_n_base = [16, 32, 64]
-    kernel_size = [(3, 3), (5, 5)]
+    #kernel_size = [(3, 3), (5, 5)]
+    kernel_size = [(5, 5)]
     learning_rate = [0.001, 0.0001, 0.00001]
     alphas = np.array([1, 0.8, 0.6, 0.4])
 
@@ -111,7 +113,7 @@ if __name__ == '__main__':
 
                     # save parameters and results to json
                     json_path = "grid_search"
-                    json_file_name = "base_grid_search_{}.json".format(n_exp)
+                    json_file_name = "base_grid_search_k5{}.json".format(n_exp)
 
                     params = {
                         "n_base": n_base,
