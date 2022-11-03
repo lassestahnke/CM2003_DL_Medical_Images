@@ -91,6 +91,9 @@ def read_grid_search_json(path, sort_by="val_dice_coef"):
     """
     File to read .json files in folder, convert them to dict and wrap them into one pandas Dataframe
     args: path [str]: path to directory
+          sort_by [str]: Name of column in DataFrame to sort
+    return:
+        pandas.dataframe of all experiments
     """
     data_frame = pd.DataFrame()
     for file in os.listdir(path):
