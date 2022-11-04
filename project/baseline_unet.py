@@ -98,3 +98,6 @@ if __name__ == '__main__':
     print(unet_hist.history.keys())
     segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
     segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset/train", dir="training_images")
+
+    learning_curves(unet_hist, "loss", "val_loss", ["dice_coef", "precision", "recall"],
+                    ["val_dice_coef", "val_precision", "val_recall"])
