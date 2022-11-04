@@ -46,7 +46,7 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set validation set split ratio
-    val_split = 0.0 # train using all data
+    val_split = 0.2 # train using all data
 
     # set model parameters
     dropout_rate = 0.2
@@ -88,6 +88,8 @@ if __name__ == '__main__':
     unet_hist = unet.fit(train_data_loader[0],
                          epochs=epochs,
                          steps_per_epoch=math.floor(num_train_samples / batch_size),
+                         validation_data=val_data_loader[0],
+                         validation_steps=math.floor(num_val_samples / batch_size),
                          use_multiprocessing=False,
                          workers=1,
                          )

@@ -107,16 +107,17 @@ def adjust_data(img, mask, binary_mask=True, num_classes=1):
         mask = mask[:, :, :, :, 0] - np.take_along_axis(diff, idx, axis=-1)[:, :, :, :, 0] # recover mask based on idx
 
         # every foreground class has its own channel
-        shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes)-1)
+        shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
         mask_multiclass = np.zeros(shape) # todo: consider batch size in mask.shape
         for i in range(len(classes)):
-            # for multiclass: remove background mask, as it would be 0 anyway
+            # for multiclass: remove background mask, as it would be 0 anyway todo: This is wrong
             if i == 0:
                 continue
             # set corresponding pixels in channel to 1 if foreground lavel i is present
             mask_class_n = mask * (mask==classes[i]) / classes[i]
-            mask_multiclass[:,:,:,i-1] = mask_class_n[:,:,:,0]
-
+            mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
+        # set background values to 1:
+        mask_multiclass[:,:,:,0] = (mask_multiclass.sum(axis=-1) == 0) * 1
         return (img, mask_multiclass)
 
 
