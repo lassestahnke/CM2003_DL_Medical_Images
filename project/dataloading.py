@@ -110,7 +110,6 @@ def adjust_data(img, mask, binary_mask=True, num_classes=1):
         shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
         mask_multiclass = np.zeros(shape) # todo: consider batch size in mask.shape
         for i in range(len(classes)):
-            # for multiclass: remove background mask, as it would be 0 anyway todo: This is wrong
             if i == 0:
                 continue
             # set corresponding pixels in channel to 1 if foreground lavel i is present

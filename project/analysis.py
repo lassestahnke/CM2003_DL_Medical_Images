@@ -130,11 +130,19 @@ def segment_from_directory(pred_dir, model, base_dir, dir):
         # use model to predict segmentation
         pred = model.predict(img[None, :,:, None])
         #pred[pred > 0.25] = 1
-        pred[pred <= 0.25] = 0
+        #pred[pred <= 0.25] = 0
+        pred_new = np.argmax(pred[0, :, :, :], axis=2)
+        pred_new[pred_new == 1] = 128
+        pred_new[pred_new == 2] = 255
+        print(pred[0, :, :, 0].max())
+        print(pred[0, :, :, 1].max())
+        print(pred[0, :, :, 2].max())
 
-        pred_new = np.zeros((pred.shape[1], pred.shape[2]))
-        pred_new[pred[0, :, :, 0] > pred[0, :, :, 1]] = 128
-        pred_new[pred[0, :, :, 0] < pred[0, :, :, 1]] = 255
+
+
+        #pred_new = np.zeros((pred.shape[1], pred.shape[2]))
+        #pred_new[pred[0, :, :, 0] > pred[0, :, :, 1]] = 128
+        #pred_new[pred[0, :, :, 0] < pred[0, :, :, 1]] = 255
 
         # modify pred to fulfil challenge requirements
         #prediction = np.zeros((pred.shape[0], pred.shape[0]))

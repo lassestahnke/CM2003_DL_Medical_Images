@@ -60,7 +60,7 @@ if __name__ == '__main__':
     alpha = 0.6
 
     # set number of epochs
-    epochs = 100
+    epochs = 300
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                                                                                        img_path=img,
@@ -97,3 +97,4 @@ if __name__ == '__main__':
     # print model history keys
     print(unet_hist.history.keys())
     segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
+    segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset/train", dir="training_images")

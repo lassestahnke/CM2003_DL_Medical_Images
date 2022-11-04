@@ -79,7 +79,7 @@ if __name__ == '__main__':
     grd_srch_n_base = [16, 32, 64]
     #kernel_size = [(3, 3), (5, 5)]
     kernel_size = [(5, 5)]
-    learning_rate = [0.001, 0.0001, 0.00001]
+    learning_rate = [0.001, 0.0001]
     alphas = np.array([1, 0.8, 0.6, 0.4])
 
 
