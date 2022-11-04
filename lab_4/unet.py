@@ -71,7 +71,7 @@ def get_unet(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=Fals
     if n_classes == 1:
         output = Conv2D(n_classes, kernel_size=(1,1), padding='same', activation='sigmoid')(level_1_dec)
     else:
-        output = Conv2D(n_classes, kernel_size=(1, 1), padding='same', activation='sigmoid')(level_1_dec)
+        output = Conv2D(n_classes, kernel_size=(1, 1), padding='same', activation='softmax')(level_1_dec)
 
     model = Model(inputs=input, outputs=output)
     return model

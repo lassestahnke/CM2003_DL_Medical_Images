@@ -107,3 +107,43 @@ def read_grid_search_json(path, sort_by="val_dice_coef"):
 
     return data_frame.sort_values(sort_by, ascending=False)
 
+def segment_from_directory(pred_dir, model, base_dir, dir):
+    """ Function to segment images from base_dir/dir directory. New directory of the same name is created within the
+        pred_dir directory.
+
+        args:
+            pred_dir [str]: Directory to save predictions
+            model [tensorflow.Model] model used for predictions
+            base_dir [str]: directory of folder that contains images to segment
+            dir: [str]: directory that contains images to segment
+    """
+
+    # create pred_dir/dir if not available
+    if not os.path.exists(os.path.join(pred_dir, dir)):
+        os.makedirs(os.path.join(pred_dir, dir))
+
+    for file in os.listdir(os.path.join(base_dir, dir)):
+        if not file.endswith(".png"):
+            continue
+        # load image img
+        img = plt.imread(os.path.join(base_dir, dir, file), format="png")
+        # use model to predict segmentation
+        pred = model.predict(img[None, :,:, None])
+        #pred[pred > 0.25] = 1
+        pred[pred <= 0.25] = 0
+
+        pred_new = np.zeros((pred.shape[1], pred.shape[2]))
+        pred_new[pred[0, :, :, 0] > pred[0, :, :, 1]] = 128
+        pred_new[pred[0, :, :, 0] < pred[0, :, :, 1]] = 255
+
+        # modify pred to fulfil challenge requirements
+        #prediction = np.zeros((pred.shape[0], pred.shape[0]))
+        #prediction = pred[0, :, :, 0] * 128 + pred[0, :, :, 1] * 255
+        print(np.unique(pred_new))
+        # write image to base_dir,dir with same name
+        plt.imsave(os.path.join(pred_dir, dir, file), pred_new, cmap="gray")
+        print("saving: ", os.path.join(pred_dir, dir, file))
+        plt.imshow(pred_new)
+        plt.show()
+
+

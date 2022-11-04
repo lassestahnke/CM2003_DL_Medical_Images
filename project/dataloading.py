@@ -219,15 +219,18 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), patch_size=
                                              binary_mask=binary_mask
                                              )
 
-            val_data_gen = train_generator(df_val,
-                                           directory=base_path,
-                                           img_path=img_path,
-                                           target_path=target_path,
-                                           batch_size=batch_size,
-                                           aug_dict={},
-                                           target_size=img_size,
-                                           binary_mask=binary_mask
-                                           )
+            if val_split <= 0:
+                val_data_gen = None
+            else:
+                val_data_gen = train_generator(df_val,
+                                               directory=base_path,
+                                               img_path=img_path,
+                                               target_path=target_path,
+                                               batch_size=batch_size,
+                                               aug_dict={},
+                                               target_size=img_size,
+                                               binary_mask=binary_mask
+                                               )
             train_gens.append(train_data_gen)
             val_gens.append(val_data_gen)
         return train_gens, val_gens, num_train_samples, num_val_samples
