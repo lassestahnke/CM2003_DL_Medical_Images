@@ -11,10 +11,10 @@ from tensorflow.keras import backend as K
 import json
 import numpy as np
 
-#gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-#gpu_device = tf.test.gpu_device_name()
-#tf.config.experimental.set_memory_growth(gpu_device, True)
-#tf.config.gpu.set_per_process_memory_growth(True)
+# gpu_devices = tf.config.experimental.list_physical_devices('GPU')
+# gpu_device = tf.test.gpu_device_name()
+# tf.config.experimental.set_memory_growth(gpu_device, True)
+# tf.config.gpu.set_per_process_memory_growth(True)
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
@@ -63,7 +63,7 @@ if __name__ == '__main__':
                                                                                        augmentation_dic=None,
                                                                                        binary_mask=binary_mask,
                                                                                        num_classes=n_classes,
-                                                                                       patch_size=(256,256))
+                                                                                       patch_size=(256, 256))
 
     print(next(train_data_loader[0])[0].shape)
     print(next(val_data_loader[0])[0].shape)
@@ -71,20 +71,16 @@ if __name__ == '__main__':
     # grid search settings
     n_exp = 0
     grd_srch_n_base = [16, 32, 64]
-    #kernel_size = [(3, 3), (5, 5)]
-    kernel_size = [(3, 3)]
+    kernel_size = [(3, 3), (5, 5)]
     learning_rate = [0.001, 0.0001]
     alphas = np.array([1, 0.8, 0.6, 0.4])
-
-
 
     for n_base in grd_srch_n_base:
         for kernel in kernel_size:
             for lr in learning_rate:
                 for alpha in alphas:
-
                     # define model
-                    unet = get_unet(input_shape=(None,None,1),
+                    unet = get_unet(input_shape=(None, None, 1),
                                     n_classes=n_classes,
                                     n_base=n_base,
                                     dropout_rate=0.2,
@@ -95,11 +91,11 @@ if __name__ == '__main__':
                                  metrics=[dice_coef, precision, recall, jaccard])
                     unet_hist = unet.fit(train_data_loader[0],
                                          epochs=epochs,
-                                         steps_per_epoch=math.floor(num_train_samples/batch_size),
+                                         steps_per_epoch=math.floor(num_train_samples / batch_size),
                                          validation_data=val_data_loader[0],
-                                         validation_steps=math.floor(num_val_samples/batch_size),
+                                         validation_steps=math.floor(num_val_samples / batch_size),
                                          use_multiprocessing=False,
-                                         workers = 1,
+                                         workers=1,
                                          )
 
                     # print model history keys
@@ -116,14 +112,14 @@ if __name__ == '__main__':
                         "kernel_size": kernel,
                         "augmentation": "None",
                         "epochs": epochs,
-                        "loss": np.array(unet_hist.history["loss"][-5:]).sum()/5,
-                        "val_loss": np.array(unet_hist.history["val_loss"][-5:]).sum()/5,
-                        "dice_coef": np.array(unet_hist.history["dice_coef"][-5:]).sum()/5,
-                        "val_dice_coef": np.array(unet_hist.history["val_dice_coef"][-5:]).sum()/5,
-                        "precision": np.array(unet_hist.history["precision"][-5:]).sum()/5,
-                        "val_precision": np.array(unet_hist.history["val_precision"][-5:]).sum()/5,
-                        "recall": np.array(unet_hist.history["recall"][-5:]).sum()/5,
-                        "val_recall": np.array(unet_hist.history["val_recall"][-5:]).sum()/5,
+                        "loss": np.array(unet_hist.history["loss"][-5:]).sum() / 5,
+                        "val_loss": np.array(unet_hist.history["val_loss"][-5:]).sum() / 5,
+                        "dice_coef": np.array(unet_hist.history["dice_coef"][-5:]).sum() / 5,
+                        "val_dice_coef": np.array(unet_hist.history["val_dice_coef"][-5:]).sum() / 5,
+                        "precision": np.array(unet_hist.history["precision"][-5:]).sum() / 5,
+                        "val_precision": np.array(unet_hist.history["val_precision"][-5:]).sum() / 5,
+                        "recall": np.array(unet_hist.history["recall"][-5:]).sum() / 5,
+                        "val_recall": np.array(unet_hist.history["val_recall"][-5:]).sum() / 5,
                         "jaccard": np.array(unet_hist.history["jaccard"][-5:]).sum() / 5,
                         "val_jaccard": np.array(unet_hist.history["val_jaccard"][-5:]).sum() / 5
                     }
@@ -131,10 +127,8 @@ if __name__ == '__main__':
                     print(params)
                     with open(os.path.join(json_path, json_file_name), "w") as outfile:
                         json.dump(params, outfile)
-                        
+
                     # code run finished debug
                     print('finished experiment ', n_exp)
                     n_exp += 1
                     K.clear_session()
-
-

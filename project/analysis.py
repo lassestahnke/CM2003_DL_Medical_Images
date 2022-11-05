@@ -4,6 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import skimage
 
 import pandas as pd
 
@@ -25,9 +26,10 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
     plt.figure(figsize=(4, 4))
     plt.title("Learning curve")
     plt.plot(history.history[loss_key], label=loss_key)  # loss is training loss
-    plt.plot(history.history[validation_loss_key], label=validation_loss_key)  # val_loss is validation loss
-    plt.plot(np.argmin(history.history[validation_loss_key]),
-             np.min(history.history[validation_loss_key]), marker="x", color="r", label="best model")
+    if validation_loss_key is not None:
+        plt.plot(history.history[validation_loss_key], label=validation_loss_key)  # val_loss is validation loss
+        plt.plot(np.argmin(history.history[validation_loss_key]),
+                 np.min(history.history[validation_loss_key]), marker="x", color="r", label="best model")
     plt.xlabel("Epochs")
     plt.ylabel("Loss Value")
     plt.ylim(loss_range)
@@ -44,7 +46,8 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
     for i in range(len(metric_keys)):
         print(metric_keys[i])
         print(metric_keys[i], history.history[metric_keys[i]][-1])
-        print(validation_metric_keys[i], history.history[validation_metric_keys[i]][-1])
+        if validation_metric_keys is not None:
+            print(validation_metric_keys[i], history.history[validation_metric_keys[i]][-1])
 
     # plotting metric curves
     for met in range(len(metric_keys)):
@@ -52,7 +55,8 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
         plt.figure(figsize=(4, 4))
         plt.title("Learning curve")
         plt.plot(history.history[metric_keys[met]], label=metric_keys[met])  # training accuracy
-        plt.plot(history.history[validation_metric_keys[met]], label=validation_metric_keys[met])  # validation accuracy
+        if validation_metric_keys is not None:
+            plt.plot(history.history[validation_metric_keys[met]], label=validation_metric_keys[met])  # validation accuracy
         plt.xlabel("Epochs")
         plt.ylabel(metric_keys[met])
         plt.ylim(metric_range)
@@ -134,13 +138,10 @@ def segment_from_directory(pred_dir, model, base_dir, dir):
         # adjust prediction to required format -> grayscale values in 1 channel
         pred_new = np.argmax(pred[0, :, :, :], axis=2)
         pred_new[pred_new == 1] = 128
-        pred_new[pred_new == 2] = 255
-        print(pred[0, :, :, 0].max())
-        print(pred[0, :, :, 1].max())
-        print(pred[0, :, :, 2].max())
+        pred_new[pred_new == 2] = 256
 
         # write image to base_dir,dir with same name
-        plt.imsave(os.path.join(pred_dir, dir, file), pred_new, cmap="gray")
+        skimage.io.imsave(os.path.join(pred_dir, dir, file), pred_new)
         print("saving: ", os.path.join(pred_dir, dir, file))
         plt.imshow(pred_new)
         plt.show()

@@ -1,6 +1,7 @@
 import SimpleITK as sitk
 import os
 
+
 def mask_vessels(path_base, path_segmentation_mask, path_vessel_masks):
     """
         Preprocessing function that generates mask with padding ar in a seperate folder.
