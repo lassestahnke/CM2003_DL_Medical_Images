@@ -192,7 +192,7 @@ def train_generator_with_weight_mask(data_frame,
 
     # scaling of grayscale image and discretising mask values
 
-def adjust_data(img, mask, weight_mask, binary_mask=True, num_classes=1):
+def adjust_data(img, mask, weight_mask = None, binary_mask=True, num_classes=1):
     img = img / 255.
 
     # normalize boundary mask
