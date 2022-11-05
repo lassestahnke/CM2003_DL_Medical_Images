@@ -74,7 +74,7 @@ def train_generator(data_frame,
 
     # rescale image and masks and return generator
     for (img, mask) in train_gen:
-        img, mask = adjust_data(img, mask, weight_mask=weight_mask ,binary_mask=binary_mask, num_classes=num_classes)
+        img, mask = adjust_data(img, mask, weight_mask=weight_mask, binary_mask=binary_mask, num_classes=num_classes)
         # draw patches
         if patch_size is not None:
             # draw indices that keep patch within image
@@ -169,7 +169,7 @@ def train_generator_with_weight_mask(data_frame,
 
     if weights_path is not None:
         for (img, weight_mask, mask) in train_gen:
-            img, boundary, mask = adjust_data(img, boundary, mask, binary_mask)
+            img, weight_mask, mask = adjust_data(img, mask, weight_mask, binary_mask)
 
             if patch_size is not None:
                 # draw indices that keep patch within image
@@ -195,7 +195,6 @@ def train_generator_with_weight_mask(data_frame,
 
 def adjust_data(img, mask, weight_mask=None, binary_mask=True, num_classes=1):
     img = img / 255.
-
     # normalize boundary mask
     if weight_mask is not None:
         weight_mask = weight_mask / 255.

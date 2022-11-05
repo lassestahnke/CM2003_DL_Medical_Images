@@ -13,10 +13,10 @@ def mask_vessels(path_base, path_segmentation_mask, path_vessel_masks):
     """
 
     mask_path = os.path.join(path_base, path_segmentation_mask)
-    boundary_path = os.path.join(path_base, path_vessel_masks)
+    weight_path = os.path.join(path_base, path_vessel_masks)
     # check if boundary dir exists, if not create it
-    if not os.path.exists(boundary_path):
-        os.makedirs(boundary_path)
+    if not os.path.exists(weight_path):
+        os.makedirs(weight_path)
 
     masks = os.listdir(mask_path)
     masks.sort()
@@ -27,7 +27,7 @@ def mask_vessels(path_base, path_segmentation_mask, path_vessel_masks):
         kernel = sitk.sitkBall
         dilated = sitk.GrayscaleDilate(msk, vectorRadius, kernel)
 
-        boundary_full_path = os.path.join(boundary_path, m)
-        sitk.WriteImage(dilated, boundary_full_path, imageIO="PNGImageIO")
+        weight_full_path = os.path.join(weight_path, m)
+        sitk.WriteImage(dilated, weight_full_path, imageIO="PNGImageIO")
 
     return
