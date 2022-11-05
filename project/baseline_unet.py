@@ -33,21 +33,21 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set validation set split ratio
-    val_split = 0.2  # train using all data
+    val_split = 0.0  # train using all data
 
     # set model parameters
-    dropout_rate = 0.2
+    dropout_rate = 0.0
     use_batch_norm = True
 
     input_size = (img_width, img_height, img_ch)
 
     n_base = 64
-    kernel = (5, 5)
+    kernel = (3, 3)
     learning_rate = 0.0001
-    alpha = 0.6
+    alpha = 0.4
 
     # set number of epochs
-    epochs = 600
+    epochs = 2000
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                                                                                        img_path=img,
@@ -75,8 +75,6 @@ if __name__ == '__main__':
     unet_hist = unet.fit(train_data_loader[0],
                          epochs=epochs,
                          steps_per_epoch=math.floor(num_train_samples / batch_size),
-                         validation_data=val_data_loader[0],
-                         validation_steps=math.floor(num_val_samples / batch_size),
                          use_multiprocessing=False,
                          workers=1,
                          )
