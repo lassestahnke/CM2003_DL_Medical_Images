@@ -221,6 +221,7 @@ def adjust_data(img, mask, weight_mask=None, binary_mask=True, num_classes=1):
 
         # every foreground class has its own channel
         shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
+
         mask_multiclass = np.zeros(shape)
         for i in range(len(classes)):
             if i == 0:

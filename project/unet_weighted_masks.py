@@ -8,6 +8,9 @@ from loss import dice_loss, combined_loss, weighted_loss
 from dataloading import load_data_with_weight_mask
 from tensorflow.keras.optimizers import Adam
 import math
+from tensorflow.python.framework.ops import disable_eager_execution
+
+disable_eager_execution()
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation

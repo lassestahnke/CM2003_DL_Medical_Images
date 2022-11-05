@@ -10,22 +10,22 @@ def dice_coef(y_true, y_pred, smooth=0):
 
 
 def jaccard(y_true, y_pred):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
+    y_true_f = K.flatten(y_true[..., 1:])
+    y_pred_f = K.flatten(y_pred[..., 1:])
     intersection = K.sum(y_true_f * y_pred_f)
     union = K.sum(y_true_f) + K.sum(y_pred_f) - intersection
     return intersection / union
 
 
 def precision(y_true, y_pred):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
+    y_true_f = K.flatten(y_true[..., 1:])
+    y_pred_f = K.flatten(y_pred[..., 1:])
     TP = K.sum(y_true_f * y_pred_f)
     return TP / K.sum(y_pred_f)
 
 
 def recall(y_true, y_pred):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
+    y_true_f = K.flatten(y_true[..., 1:])
+    y_pred_f = K.flatten(y_pred[..., 1:])
     TP = K.sum(y_true_f * y_pred_f)
     return TP / K.sum(y_true_f)
