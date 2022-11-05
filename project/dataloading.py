@@ -169,7 +169,7 @@ def train_generator_with_weight_mask(data_frame,
 
     if weights_path is not None:
         for (img, weight_mask, mask) in train_gen:
-            img, weight_mask, mask = adjust_data(img, mask, weight_mask, binary_mask)
+            img, weight_mask, mask = adjust_data(img, mask, weight_mask, binary_mask, num_classes=num_classes)
 
             if patch_size is not None:
                 # draw indices that keep patch within image
