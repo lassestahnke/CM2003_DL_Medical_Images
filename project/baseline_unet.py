@@ -6,26 +6,13 @@ from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves, segment_from_directory
 from loss import dice_loss, combined_loss
 from dataloading import load_data
-from tensorflow.keras import metrics
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.preprocessing.image import array_to_img
-import matplotlib.pyplot as plt
-import tensorflow as tf
 import math
-from skimage.io import imread
-from tensorflow.keras import backend as K
-import json
-import numpy as np
-
-#gpu_devices = tf.config.experimental.list_physical_devices('GPU')
-#gpu_device = tf.test.gpu_device_name()
-#tf.config.experimental.set_memory_growth(gpu_device, True)
-#tf.config.gpu.set_per_process_memory_growth(True)
 
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
-    #base_path = "/home/student/tf-lasse/project/dataset/train"
+    # base_path = "/home/student/tf-lasse/project/dataset/train"
     base_path = "../project/dataset/train"
     masks = "training_masks"
     img = "training_images"
@@ -46,7 +33,7 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set validation set split ratio
-    val_split = 0.2 # train using all data
+    val_split = 0.2  # train using all data
 
     # set model parameters
     dropout_rate = 0.2
@@ -55,12 +42,12 @@ if __name__ == '__main__':
     input_size = (img_width, img_height, img_ch)
 
     n_base = 64
-    kernel = (5,5)
+    kernel = (5, 5)
     learning_rate = 0.0001
     alpha = 0.6
 
     # set number of epochs
-    epochs = 300
+    epochs = 600
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                                                                                        img_path=img,
@@ -71,7 +58,7 @@ if __name__ == '__main__':
                                                                                        augmentation_dic=None,
                                                                                        binary_mask=binary_mask,
                                                                                        num_classes=n_classes,
-                                                                                       patch_size=(256,256))
+                                                                                       patch_size=(256, 256))
 
     print(next(train_data_loader[0])[0].shape)
 

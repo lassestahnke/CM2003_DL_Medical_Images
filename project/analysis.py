@@ -35,7 +35,7 @@ def learning_curves(history, loss_key, validation_loss_key, metric_keys, validat
     plt.legend()
 
     if save_path is not None:
-        plt.savefig(os.path.join(save_path,"losses.png"))
+        plt.savefig(os.path.join(save_path, "losses.png"))
 
     plt.show()
 
@@ -107,6 +107,7 @@ def read_grid_search_json(path, sort_by="val_dice_coef"):
 
     return data_frame.sort_values(sort_by, ascending=False)
 
+
 def segment_from_directory(pred_dir, model, base_dir, dir):
     """ Function to segment images from base_dir/dir directory. New directory of the same name is created within the
         pred_dir directory.
@@ -128,9 +129,9 @@ def segment_from_directory(pred_dir, model, base_dir, dir):
         # load image img
         img = plt.imread(os.path.join(base_dir, dir, file), format="png")
         # use model to predict segmentation
-        pred = model.predict(img[None, :,:, None])
-        #pred[pred > 0.25] = 1
-        #pred[pred <= 0.25] = 0
+        pred = model.predict(img[None, :, :, None])
+
+        # adjust prediction to required format -> grayscale values in 1 channel
         pred_new = np.argmax(pred[0, :, :, :], axis=2)
         pred_new[pred_new == 1] = 128
         pred_new[pred_new == 2] = 255
@@ -138,20 +139,8 @@ def segment_from_directory(pred_dir, model, base_dir, dir):
         print(pred[0, :, :, 1].max())
         print(pred[0, :, :, 2].max())
 
-
-
-        #pred_new = np.zeros((pred.shape[1], pred.shape[2]))
-        #pred_new[pred[0, :, :, 0] > pred[0, :, :, 1]] = 128
-        #pred_new[pred[0, :, :, 0] < pred[0, :, :, 1]] = 255
-
-        # modify pred to fulfil challenge requirements
-        #prediction = np.zeros((pred.shape[0], pred.shape[0]))
-        #prediction = pred[0, :, :, 0] * 128 + pred[0, :, :, 1] * 255
-        print(np.unique(pred_new))
         # write image to base_dir,dir with same name
         plt.imsave(os.path.join(pred_dir, dir, file), pred_new, cmap="gray")
         print("saving: ", os.path.join(pred_dir, dir, file))
         plt.imshow(pred_new)
         plt.show()
-
-

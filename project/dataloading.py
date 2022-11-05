@@ -7,9 +7,6 @@ import os
 import random
 
 
-
-
-
 # following function is adopted from https://www.kaggle.com/code/lqdisme/brain-mri-segmentation-unet-keras
 def train_generator(data_frame,
                     directory,
@@ -23,7 +20,7 @@ def train_generator(data_frame,
                     binary_mask=True,
                     num_classes=1,
                     seed=1337,
-                    patch_size = None
+                    patch_size=None
                     ):
     """
     Function to create instances of ImageDataGenerator for loading and augmenting images
@@ -47,7 +44,6 @@ def train_generator(data_frame,
     """
     image_datagen = ImageDataGenerator(**aug_dict)
     mask_datagen = ImageDataGenerator(**aug_dict)
-
 
     # creating instance of ImageDataGenerator for loading and augmenting images
     image_generator = image_datagen.flow_from_dataframe(
@@ -83,11 +79,13 @@ def train_generator(data_frame,
             # draw indices that keep patch within image
             idx_w = random.randint(0, target_size[0] - patch_size[0])
             idx_h = random.randint(0, target_size[1] - patch_size[1])
-            img = img[:,idx_w:idx_w + patch_size[0], idx_h:idx_h + patch_size[1],:]
-            mask = mask[:,idx_w:idx_w + patch_size[0], idx_h:idx_h + patch_size[1],:]
+            img = img[:, idx_w:idx_w + patch_size[0], idx_h:idx_h + patch_size[1], :]
+            mask = mask[:, idx_w:idx_w + patch_size[0], idx_h:idx_h + patch_size[1], :]
         yield (img, mask)
 
     # scaling of grayscale image and discretising mask values
+
+
 def adjust_data(img, mask, binary_mask=True, num_classes=1):
     img = img / 255.
 
@@ -98,30 +96,39 @@ def adjust_data(img, mask, binary_mask=True, num_classes=1):
         mask[mask <= 0] = 0
         return (img, mask)
     else:
-                                                                                # read pixel of individual labels in mask
-        mask = np.repeat(mask[:, :, :, :, np.newaxis], num_classes+1, axis=-1)  # expand mask on last dimension
-        classes = np.linspace(0, 255, num_classes+1, dtype=int)                 # find grayscale values of classes
-        diff = mask - classes                                                   # calculate the distance between class grayscale values and image
-        idx = np.argmin(np.abs(diff), axis=-1)                                  # find indices of the smallest distance to class grayscale value
+        # read pixel of individual labels in mask
+        mask = np.repeat(mask[:, :, :, :, np.newaxis], num_classes + 1, axis=-1)  # expand mask on last dimension
+        classes = np.linspace(0, 255, num_classes + 1, dtype=int)  # find grayscale values of classes
+        diff = mask - classes  # calculate the distance between class grayscale values and image
+        idx = np.argmin(np.abs(diff), axis=-1)  # find indices of the smallest distance to class grayscale value
         idx = idx[:, :, :, :, np.newaxis]
-        mask = mask[:, :, :, :, 0] - np.take_along_axis(diff, idx, axis=-1)[:, :, :, :, 0] # recover mask based on idx
+        mask = mask[:, :, :, :, 0] - np.take_along_axis(diff, idx, axis=-1)[:, :, :, :, 0]  # recover mask based on idx
 
         # every foreground class has its own channel
         shape = (mask.shape[0], mask.shape[1], mask.shape[2], len(classes))
-        mask_multiclass = np.zeros(shape) # todo: consider batch size in mask.shape
+        mask_multiclass = np.zeros(shape)
         for i in range(len(classes)):
             if i == 0:
                 continue
             # set corresponding pixels in channel to 1 if foreground lavel i is present
-            mask_class_n = mask * (mask==classes[i]) / classes[i]
-            mask_multiclass[:,:,:,i] = mask_class_n[:,:,:,0]
+            mask_class_n = mask * (mask == classes[i]) / classes[i]
+            mask_multiclass[:, :, :, i] = mask_class_n[:, :, :, 0]
         # set background values to 1:
-        mask_multiclass[:,:,:,0] = (mask_multiclass.sum(axis=-1) == 0) * 1
+        mask_multiclass[:, :, :, 0] = (mask_multiclass.sum(axis=-1) == 0) * 1
         return (img, mask_multiclass)
 
 
-def load_data(base_path, img_path, target_path, img_size=(256, 256), patch_size=None,  val_split=0.0, batch_size=8, augmentation_dic=None,
-              binary_mask=True, cross_val=1, num_classes=1):
+def load_data(base_path,
+              img_path,
+              target_path,
+              img_size=(256, 256),
+              patch_size=None,
+              val_split=0.0,
+              batch_size=8,
+              augmentation_dic=None,
+              binary_mask=True,
+              cross_val=1,
+              num_classes=1):
     """
     Function to load data and return a ImageDataGenerator Object for model training
 
@@ -160,7 +167,7 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), patch_size=
     if cross_val == 1:
         # todo add option to split data based on number of patients instead of number of images
         # split into train and validation set
-        num_train_samples = int(data.shape[0] * (1-val_split))
+        num_train_samples = int(data.shape[0] * (1 - val_split))
         num_val_samples = data.shape[0] - num_train_samples
         train_data = data.iloc[:num_train_samples, :]
         val_data = data.iloc[num_train_samples:, :]
@@ -177,7 +184,6 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), patch_size=
                                          patch_size=patch_size
                                          )
 
-
         val_data_gen = train_generator(val_data,
                                        directory=base_path,
                                        img_path=img_path,
@@ -185,27 +191,27 @@ def load_data(base_path, img_path, target_path, img_size=(256, 256), patch_size=
                                        batch_size=batch_size,
                                        aug_dict={},
                                        target_size=img_size,
-                                       binary_mask = binary_mask,
+                                       binary_mask=binary_mask,
                                        num_classes=num_classes,
                                        patch_size=None
                                        )
         return [train_data_gen], [val_data_gen], num_train_samples, num_val_samples
 
     if cross_val > 1:
-        chunk_size = math.floor(len(data)/cross_val)
+        chunk_size = math.floor(len(data) / cross_val)
         train_gens = []  # set list of train_generators
         val_gens = []  # set list of validation generators
 
-        num_train_samples = (cross_val-1) * chunk_size
+        num_train_samples = (cross_val - 1) * chunk_size
         num_val_samples = chunk_size
 
         for k in range(cross_val):
             idx = np.arange(len(data))
             mask_train = np.ones(len(idx), dtype=bool)
-            mask_train[k*chunk_size:(k+1)*chunk_size] = False
+            mask_train[k * chunk_size:(k + 1) * chunk_size] = False
             mask_val = (mask_train == False)
 
-            df_train = data.iloc[idx[mask_train]] # use all data except for k_th fold as training data
+            df_train = data.iloc[idx[mask_train]]  # use all data except for k_th fold as training data
             df_val = data.iloc[idx[mask_val]]  # only use k_th fold as validation data
 
             # get training generator for images and masks

@@ -3,16 +3,10 @@ import os
 
 from unet import get_unet
 from metrics import dice_coef, precision, recall, jaccard
-from analysis import learning_curves
 from loss import dice_loss, combined_loss
 from dataloading import load_data
-from tensorflow.keras import metrics
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.preprocessing.image import array_to_img
-import matplotlib.pyplot as plt
-import tensorflow as tf
 import math
-from skimage.io import imread
 from tensorflow.keras import backend as K
 import json
 import numpy as np
@@ -25,7 +19,7 @@ import numpy as np
 if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
-    #base_path = "/home/student/tf-lasse/project/dataset/train"
+    # base_path = "/home/student/tf-lasse/project/dataset/train"
     base_path = "../project/dataset/train"
     masks = "training_masks"
     img = "training_images"
@@ -78,7 +72,7 @@ if __name__ == '__main__':
     n_exp = 0
     grd_srch_n_base = [16, 32, 64]
     #kernel_size = [(3, 3), (5, 5)]
-    kernel_size = [(5, 5)]
+    kernel_size = [(3, 3)]
     learning_rate = [0.001, 0.0001]
     alphas = np.array([1, 0.8, 0.6, 0.4])
 
@@ -113,7 +107,7 @@ if __name__ == '__main__':
 
                     # save parameters and results to json
                     json_path = "grid_search"
-                    json_file_name = "base_grid_search_k5{}.json".format(n_exp)
+                    json_file_name = "base_grid_search_k3_{}.json".format(n_exp)
 
                     params = {
                         "n_base": n_base,
