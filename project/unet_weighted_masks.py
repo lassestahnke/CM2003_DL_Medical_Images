@@ -3,7 +3,7 @@ import os
 
 from unet import get_unet, get_unet_weighted
 from metrics import dice_coef, precision, recall, jaccard
-from analysis import learning_curves, segment_from_directory
+from analysis import learning_curves, segment_from_directory, segment_from_directory_weighted
 from loss import dice_loss, combined_loss, weighted_loss
 from dataloading import load_data_with_weight_mask
 from tensorflow.keras.optimizers import Adam
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     masks = "training_masks"
     img = "training_images"
     weight_masks = "training_masks_dilated"
-    weight_strength = 0.5
+    weight_strength = 1.4
     # mask_vessels(base_path, 'training_masks', 'training_mask_dilated')
 
     # set model parameters
@@ -49,12 +49,12 @@ if __name__ == '__main__':
     input_size = (img_width, img_height, img_ch)
 
     n_base = 64
-    kernel = (5, 5)
+    kernel = (3, 3)
     learning_rate = 0.0001
-    alpha = 0.6
+    alpha = 0.4
 
     # set number of epochs
-    epochs = 3
+    epochs = 100
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data_with_weight_mask(base_path=base_path,
                                                                                                         img_path=img,
@@ -97,8 +97,8 @@ if __name__ == '__main__':
     unet.save('models/unet_baseline')
     # print model history keys
     print(unet_hist.history.keys())
-    segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
-    segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset/train", dir="training_images")
+    segment_from_directory_weighted(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
+    segment_from_directory_weighted(pred_dir="predictions", model=unet, base_dir="dataset/train", dir="training_images")
 
     learning_curves(unet_hist, "loss", "val_loss", ["dice_coef", "precision", "recall"],
                     ["val_dice_coef", "val_precision", "val_recall"])

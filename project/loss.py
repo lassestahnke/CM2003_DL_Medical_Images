@@ -25,6 +25,6 @@ def weighted_loss(weight_map, weight_strength):
         weight_f = weight_f * weight_strength
         weight_f = weight_f + 1
         weighted_intersection = K.sum(weight_f * (y_true_f * y_pred_f))
-        return -(2. * weighted_intersection + K.epsilon()) / (K.sum(y_true_f) + K.sum(y_pred_f) + K.epsilon())
+        return 1-(2. * weighted_intersection + K.epsilon()) / (K.sum(y_true_f) + K.sum(y_pred_f) + K.epsilon())
     return weighted_dice_loss
 
