@@ -25,7 +25,7 @@ def res_block(input, filters, kernel_size, stride):
     conv_2 = Conv2D(filters=filters, kernel_size=kernel_size, padding='same', strides=1)(batch_1)
     batch_1 = BatchNormalization()(conv_2)
     batch_1 = Activation('relu')(batch_1)
-    out = Add([input, batch_1])
+    out = Add()([input, batch_1])
     return out
 
 
