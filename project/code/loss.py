@@ -8,8 +8,8 @@ def dice_loss(y_true, y_pred):
 
 def combined_loss(alpha):
     def loss(y_true, y_pred):
-        bce = BinaryCrossentropy()
-        return alpha * dice_loss(y_true, y_pred) + (1 - alpha) * bce(y_true, y_pred)
+        cce = CategoricalCrossentropy()
+        return alpha * dice_loss(y_true, y_pred) + (1 - alpha) * cce(y_true, y_pred)
 
     return loss
 
