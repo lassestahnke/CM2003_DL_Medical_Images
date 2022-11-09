@@ -19,12 +19,12 @@ def conv_block(input, filters, kernel_size, use_batch_norm):
     return relu_2
 
 def res_block(input, filters, kernel_size):
+    conv_1 = Conv2D(filters, kernel_size=kernel_size, padding='same', strides=2)(batch_1)
+    batch_1 = BatchNormalization()(conv_1)
+    batch_1 = Activation('relu')(batch_1)
+    conv_2 = Conv2D(filters, kernel_size=kernel_size, padding='same', strides=1)(batch_1)
     batch_1 = BatchNormalization()(input)
     batch_1 = Activation('relu')(batch_1)
-    conv_1 = Conv2D(filters, kernel_size=kernel_size, padding='same', strides=1)(batch_1)
-    batch_2 = BatchNormalization()(conv_1)
-    batch_2 = Activation('relu')(batch_2)
-    conv_2 = Conv2D(filters, kernel_size=kernel_size, padding='same', strides=1)(batch_2)
     out = Add([input, conv_2])
     return out
 
@@ -49,14 +49,9 @@ def get_ResUnet(input_shape, n_classes, n_base, dropout_rate=0, kernel_size=(3, 
     n_classes = n_classes + 1  # add background label
     input = Input(shape=input_shape)
     # define encoder
-    # level 0
-
-
     # level 1
-    level_1_enc = conv_block(input=input, filters=n_base, kernel_size=kernel_size,
-                             use_batch_norm=use_batch_norm)
-    level_1_max_pool = MaxPool2D(pool_size=(2, 2))(level_1_enc)
-    level_1_max_pool = SpatialDropout2D(dropout_rate)(level_1_max_pool)
+    level_1_enc = res_block(input=input, filters=n_base, kernel_size=kernel_size)
+    level_1_max_pool = SpatialDropout2D(dropout_rate)(level_1_enc)
 
     # level 2
     level_2_enc = conv_block(input=level_1_max_pool, filters=2 * n_base, kernel_size=kernel_size,
