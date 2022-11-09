@@ -1,5 +1,7 @@
 from metrics import dice_coef
 from tensorflow.keras.losses import BinaryCrossentropy
+from tensorflow.keras.losses import CategoricalCrossentropy
+
 import tensorflow.keras.backend as K
 
 def dice_loss(y_true, y_pred):
@@ -8,8 +10,9 @@ def dice_loss(y_true, y_pred):
 
 def combined_loss(alpha):
     def loss(y_true, y_pred):
-        bce = BinaryCrossentropy()
-        return alpha * dice_loss(y_true, y_pred) + (1 - alpha) * bce(y_true, y_pred)
+        #bce = BinaryCrossentropy()
+        cce = CategoricalCrossentropy()
+        return alpha * dice_loss(y_true, y_pred) + (1 - alpha) * cce(y_true, y_pred)
 
     return loss
 
