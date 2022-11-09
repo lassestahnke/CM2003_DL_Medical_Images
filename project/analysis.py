@@ -133,7 +133,41 @@ def segment_from_directory(pred_dir, model, base_dir, dir):
         # load image img
         img = plt.imread(os.path.join(base_dir, dir, file), format="png")
         # use model to predict segmentation
-        pred = model.predict(img[None, :, :, None])
+        pred = model.predict([img[None, :, :, None]])
+
+        # adjust prediction to required format -> grayscale values in 1 channel
+        pred_new = np.argmax(pred[0, :, :, :], axis=2)
+        pred_new[pred_new == 1] = 128
+        pred_new[pred_new == 2] = 256
+
+        # write image to base_dir,dir with same name
+        skimage.io.imsave(os.path.join(pred_dir, dir, file), pred_new)
+        print("saving: ", os.path.join(pred_dir, dir, file))
+        plt.imshow(pred_new)
+        plt.show()
+
+def segment_from_directory_weighted(pred_dir, model, base_dir, dir):
+    """ Function to segment images from base_dir/dir directory. New directory of the same name is created within the
+        pred_dir directory.
+
+        args:
+            pred_dir [str]: Directory to save predictions
+            model [tensorflow.Model] model used for predictions
+            base_dir [str]: directory of folder that contains images to segment
+            dir: [str]: directory that contains images to segment
+    """
+
+    # create pred_dir/dir if not available
+    if not os.path.exists(os.path.join(pred_dir, dir)):
+        os.makedirs(os.path.join(pred_dir, dir))
+
+    for file in os.listdir(os.path.join(base_dir, dir)):
+        if not file.endswith(".png"):
+            continue
+        # load image img
+        img = plt.imread(os.path.join(base_dir, dir, file), format="png")
+        # use model to predict segmentation
+        pred = model.predict([img[None, :, :, None], img[None, :, :, None]])
 
         # adjust prediction to required format -> grayscale values in 1 channel
         pred_new = np.argmax(pred[0, :, :, :], axis=2)
