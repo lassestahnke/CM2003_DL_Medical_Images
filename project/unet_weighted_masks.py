@@ -4,11 +4,12 @@ import os
 from unet import get_unet, get_unet_weighted
 from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves, segment_from_directory, segment_from_directory_weighted
-from loss import dice_loss, combined_loss, weighted_loss
+from loss import dice_loss, combined_loss, weighted_loss, combined_weighted_loss
 from dataloading import load_data_with_weight_mask
 from tensorflow.keras.optimizers import Adam
 import math
 from tensorflow.python.framework.ops import disable_eager_execution
+from tensorflow.keras import backend as K
 
 disable_eager_execution()
 
@@ -17,11 +18,15 @@ if __name__ == '__main__':
     # set paths to data
     # base_path = "/home/student/tf-lasse/project/dataset/train"
     base_path = "../project/dataset/train"
-    #base_path = os.path.join("dataset", "train")
+    # base_path = os.path.join("dataset", "train")
     masks = "training_masks"
     img = "training_images"
-    weight_masks = "training_masks_dilated"
-    weight_strength = 1.4
+    # weight_masks = "training_masks_dilated"
+    # weight_masks = "training_masks_dilated_eroded"
+    # weight_masks = "training_masks_small_boundary"
+    #weight_masks = "training_masks_preprocessing_3"
+    weight_masks = "training_masks_small_boundary"
+    weight_strength = 0.2
     # mask_vessels(base_path, 'training_masks', 'training_mask_dilated')
 
     # set model parameters
@@ -50,11 +55,19 @@ if __name__ == '__main__':
 
     n_base = 64
     kernel = (3, 3)
-    learning_rate = 0.0001
-    alpha = 0.4
+    learning_rate = 0.0005
+    alpha = 0.6
 
     # set number of epochs
-    epochs = 100
+    epochs = 2000
+
+    augumentation_dict = dict(rotation_range = 10,
+                              width_shift_range = 0.2,
+                              height_shift_range = 0.2,
+                              zoom_range = [0.1, 1.4],
+                              horizontal_flip = True,
+                              fill_mode = 'reflect',
+                              )
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data_with_weight_mask(base_path=base_path,
                                                                                                         img_path=img,
@@ -63,15 +76,15 @@ if __name__ == '__main__':
                                                                                                         val_split=val_split,
                                                                                                         batch_size=batch_size,
                                                                                                         img_size=(img_width, img_height),
-                                                                                                        augmentation_dic=None,
+                                                                                                        augmentation_dic=augumentation_dict,
                                                                                                         binary_mask=binary_mask,
                                                                                                         num_classes=n_classes,
-                                                                                                        patch_size=(256, 256))
+                                                                                                        patch_size=(128, 128))
 
     #print(next(train_data_loader[0])[0][1])
-    print("image gen shape:", next(train_data_loader[0])[0][0].shape)
-    print("weight map gen shape:", next(train_data_loader[0])[0][1].shape)
-    print("mask gen shape:", next(train_data_loader[0])[1].shape)
+    #print("image gen shape:", next(train_data_loader[0])[0][0].shape)
+    #print("weight map gen shape:", next(train_data_loader[0])[0][1].shape)
+    #print("mask gen shape:", next(train_data_loader[0])[1].shape)
 
     # define model
     unet, loss_weights = get_unet_weighted(input_shape=(None, None, 1),
@@ -82,7 +95,7 @@ if __name__ == '__main__':
                                            weights_path=weight_masks)
     unet.summary()
     unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 loss=weighted_loss(loss_weights, weight_strength),
+                 loss=combined_weighted_loss(loss_weights, weight_strength, alpha),
                  metrics=[dice_coef, precision, recall, jaccard])
 
     unet_hist = unet.fit(train_data_loader[0],
@@ -102,3 +115,5 @@ if __name__ == '__main__':
 
     learning_curves(unet_hist, "loss", "val_loss", ["dice_coef", "precision", "recall"],
                     ["val_dice_coef", "val_precision", "val_recall"])
+
+    K.clear_session()
