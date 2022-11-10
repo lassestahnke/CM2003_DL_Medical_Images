@@ -10,6 +10,12 @@ def combined_loss(alpha):
     def loss(y_true, y_pred):
         cce = CategoricalCrossentropy()
         return alpha * dice_loss(y_true, y_pred) + (1 - alpha) * cce(y_true, y_pred)
+    return loss
+
+def combined_loss_class_dice(alpha, beta):
+    def loss(y_true, y_pred):
+        cce = CategoricalCrossentropy()
+        return alpha * dice_loss(y_true[...,1], y_pred[...,1]) + beta * dice_loss(y_true[...,2], y_pred[...,2]) + (1 - alpha - beta) * cce(y_true, y_pred)
 
     return loss
 
