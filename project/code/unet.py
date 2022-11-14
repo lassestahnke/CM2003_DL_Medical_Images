@@ -107,7 +107,8 @@ def get_unet(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=Fals
     return model
 
 
-def get_unet_weighted(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=False, kernel_size=(3, 3), weights_path=None):
+def get_unet_weighted(input_shape, n_classes, n_base, dropout_rate=0, use_batch_norm=False, kernel_size=(3, 3),
+                      weights_path=None):
     """
     Function to return unet model as tensorflow model. Model is slightly modified compared to Ronneberger et al. 2015
     -> Model incorporates batch norm and dropout. Furthermore, it uses padding = same to keep the original image size.
