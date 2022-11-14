@@ -107,7 +107,7 @@ if __name__ == '__main__':
                          workers=1,
                          )
 
-    unet.save('models/unet_baseline')
+    unet.save('models/unet_weighted_masks')
     # print model history keys
     print(unet_hist.history.keys())
     segment_from_directory_weighted(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
