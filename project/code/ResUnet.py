@@ -19,11 +19,11 @@ def conv_block(input, filters, kernel_size, use_batch_norm):
     return relu_2
 
 def res_block(input, filters, kernel_size, stride):
-    identity_conv_shortcut = Conv2D(filters=filters, kernel_size = (1,1), padding='same')(input)
-    conv_1 = Conv2D(filters=filters, kernel_size=kernel_size, padding='same', strides=stride)(input)
+    identity_conv_shortcut = Conv2D(filters=filters, kernel_size = (1,1), padding='same', strides = (stride,stride))(input)
+    conv_1 = Conv2D(filters=filters, kernel_size=kernel_size, padding='same', strides=(stride, stride))(input)
     batch_1 = BatchNormalization()(conv_1)
     batch_1 = Activation('relu')(batch_1)
-    conv_2 = Conv2D(filters=filters, kernel_size=kernel_size, padding='same', strides=1)(batch_1)
+    conv_2 = Conv2D(filters=filters, kernel_size=kernel_size, padding='same', strides=(1, 1))(batch_1)
     batch_2 = BatchNormalization()(conv_2)
     batch_2 = Activation('relu')(batch_2)
     out = Add()([identity_conv_shortcut, batch_2])
@@ -51,10 +51,10 @@ def get_ResUnet(input_shape, n_classes, n_base, dropout_rate=0, kernel_size=(3, 
     input = Input(shape=input_shape)
     # define encoder
     # level 1
-    level_1_enc = Conv2D(filters=n_base, kernel_size=kernel_size, padding='same', strides=1)(input)
+    level_1_enc = Conv2D(filters=n_base, kernel_size=kernel_size, padding='same', strides=(1,1))(input)
     level_1_enc = BatchNormalization()(level_1_enc)
     level_1_enc = Activation('relu')(level_1_enc)
-    level_1_enc = Conv2D(filters=n_base, kernel_size=kernel_size, padding='same', strides=1)(level_1_enc)
+    level_1_enc = Conv2D(filters=n_base, kernel_size=kernel_size, padding='same', strides=(1,1))(level_1_enc)
     level_1_dropout = SpatialDropout2D(dropout_rate)(level_1_enc)
     level_1_out = Add()([input, level_1_dropout])
 
@@ -68,10 +68,10 @@ def get_ResUnet(input_shape, n_classes, n_base, dropout_rate=0, kernel_size=(3, 
 
 
     # Bridge / level 4
-    bridge_in = Conv2D(filters = 8 * n_base, kernel_size=kernel_size, padding='same', strides=2)(level_3_dropout)
+    bridge_in = Conv2D(filters = 8 * n_base, kernel_size=kernel_size, padding='same', strides=(2,2))(level_3_dropout)
     bridge = BatchNormalization()(bridge_in)
     bridge = Activation('relu')(bridge)
-    bridge = Conv2D(filters = 8 * n_base, kernel_size=kernel_size, padding='same', strides=1)(bridge)
+    bridge = Conv2D(filters = 8 * n_base, kernel_size=kernel_size, padding='same', strides=(1,1))(bridge)
     bridge = BatchNormalization()(bridge)
     bridge_out = Activation('relu')(bridge)
 
