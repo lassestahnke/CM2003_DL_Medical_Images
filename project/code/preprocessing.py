@@ -2,10 +2,12 @@ import SimpleITK as sitk
 import os
 from skimage.io import imread, imsave
 from skimage import exposure
+import numpy as np
+
 
 def mask_vessels(path_base, path_segmentation_mask, path_vessel_masks):
     """
-        Preprocessing function that generates mask with padding ar in a seperate folder.
+        Preprocessing function that generates mask with padding ar in a separate folder.
         Performed by dilation. 
         Arguments:
             path_base: base path to segmentation mask folder
@@ -34,46 +36,53 @@ def mask_vessels(path_base, path_segmentation_mask, path_vessel_masks):
     return
 
 
-def convert_drive_data(base_dir, img_dir, mask_dir, new_base_dir, extension=".png"):
+def rescale_intensity_from_directory(base_dir, img_dir, mask_dir, new_base_dir=None, new_img_dir=None,
+                                     new_mask_dir=None, extension=".png"):
     """
-    Function to convert data from drive challenge to grayscale. Change names of files
+    Load images and segmentation masks to grayscale. Change names of files
     so that names of images and masks are coherent and store them in img/mask directory within a train
     directory
 
     args:
         base_dir: [string] path to base directory of drive dataset
         img_dir: [string] name of image directory
-        mask_dir: [string] name of mask directory
-        new_base_dir: [string] path to new dataset folder
+        mask_dir: [string] name of mask directory; If mask_dir is None, no masks are processed
+        new_base_dir: [string] path to new dataset folder; if new_base_dir is None, old dir is overwritten
         extension: [string] extension of new image and mask files
     return
     """
 
     # set new directory names:
-    new_im_folder = "training_images"
-    new_mask_folder = "training_masks"
+    if new_base_dir is None:
+        new_base_dir = base_dir
+
+    if new_img_dir is None:
+        new_img_dir = img_dir
 
     # check if new directories exist, if not then create
     if not os.path.isdir(os.path.join(new_base_dir)):
         os.mkdir(os.path.join(new_base_dir))
 
-    if not os.path.isdir(os.path.join(new_base_dir, new_im_folder)):
-        os.mkdir(os.path.join(new_base_dir, new_im_folder))
+    if not os.path.isdir(os.path.join(new_base_dir, new_img_dir)):
+        os.mkdir(os.path.join(new_base_dir, new_img_dir))
 
-    if not os.path.isdir(os.path.join(new_base_dir, new_mask_folder)):
-        os.mkdir(os.path.join(new_base_dir, new_mask_folder))
+    if mask_dir is not None:
+        if new_mask_dir is None:
+            new_mask_dir = mask_dir
 
-    # first process images:
+        if not os.path.isdir(os.path.join(new_base_dir, new_mask_dir)):
+            os.mkdir(os.path.join(new_base_dir, new_mask_dir))
+
+    # load and process images:
     for file in os.listdir(os.path.join(base_dir, img_dir)):
         image = imread(os.path.join(base_dir, img_dir, file), as_gray=True)
         # use contrast stretching
-        image = exposure.rescale_intensity(image, in_range=(0, 1))
-        imsave(os.path.join(new_base_dir, new_im_folder, file[0:2] + extension), image)
+        p2, p98 = np.percentile(image, (0, 98))
+        image = exposure.rescale_intensity(image, in_range=(p2, p98))
+        imsave(os.path.join(new_base_dir, new_img_dir, file[0:-4] + extension), image)
 
-    # process masks:
-    for file in os.listdir(os.path.join(base_dir, mask_dir)):
-        mask = imread(os.path.join(base_dir, mask_dir, file), as_gray=True)
-        imsave(os.path.join(new_base_dir, new_mask_folder, file[0:2] + extension), mask)
-
-
-
+    # load and process masks:
+    if mask_dir is not None:
+        for file in os.listdir(os.path.join(base_dir, mask_dir)):
+            mask = imread(os.path.join(base_dir, mask_dir, file), as_gray=True)
+            imsave(os.path.join(new_base_dir, new_mask_dir, file[0:-4] + extension), mask)
