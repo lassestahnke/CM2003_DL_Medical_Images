@@ -15,12 +15,12 @@ if __name__ == '__main__':
 
     base_path = "../"
     model_dir = "models"
-    model_name = "unet_baseline_600_epochs"
+    model_name = "unet_baseline"
 
     masks = "training_masks"
     img = "training_images"
 
-    model = load_model(os.path.join(base_path, model_dir, model_name))#, custom_objects=custom_objects)
+    model = load_model(os.path.join(base_path, model_dir, model_name))
 
     alpha = 0.4
     learning_rate = 1e-4

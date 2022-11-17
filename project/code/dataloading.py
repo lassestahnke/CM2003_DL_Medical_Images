@@ -253,20 +253,20 @@ def load_data(base_path,
     Function to load data and return a ImageDataGenerator Object for model training
 
     args:
-        base_path: [string] Path to main directory.
-        img_path: [string] Name of image directory.
-        weights_path: [string] Name of the weight_masks directory.
-        target_path: [string] Name of mask directory.
-        img_size: [tuple] size of image. (img_width, img_height, img_channel).
-        patch_size: [tuple] size of patches (patch_width, patch_height), if None: patch_size=img_size
-        val_split: [float] split of data; relative number of validation data; between 0 and 1;
+        base_path:      [string] Path to main directory.
+        img_path:       [string] Name of image directory.
+        weights_path:   [string] Name of the weight_masks directory.
+        target_path:    [string] Name of mask directory.
+        img_size:       [tuple] size of image. (img_width, img_height, img_channel).
+        patch_size:     [tuple] size of patches (patch_width, patch_height), if None: patch_size=img_size
+        val_split:      [float] split of data; relative number of validation data; between 0 and 1;
                             only used for cross val = 1
-        batch_size: [int] Number of samples per batch.
-        augmentation_dic: [dict] Dictionary of augmentation arguments.
+        batch_size:     [int] Number of samples per batch.
+        augmentation_dic:[dict] Dictionary of augmentation arguments.
                                 See tf.keras.preprocessing.image.ImageDataGenerator doc for info.
-        binary_mask: [bool] Bool if binary segmentation mask is used. If True: maks has one channel and two;
+        binary_mask:    [bool] Bool if binary segmentation mask is used. If True: maks has one channel and two;
                             If False: mask has n-unique channels.
-        cross_val: [int] nuber of k-folds for cross validation
+        cross_val:      [int] nuber of k-folds for cross validation
     returns:
         data_gen: [iterator]: Training generator
     """
