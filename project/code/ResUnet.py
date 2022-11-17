@@ -65,20 +65,29 @@ def get_ResUnet(input_shape, n_classes, n_base, dropout_rate=0, kernel_size=(3, 
     # level 3
     level_3_enc = res_block(input=level_2_dropout, filters=4 * n_base, kernel_size=kernel_size, stride=2)
     level_3_dropout = SpatialDropout2D(dropout_rate)(level_3_enc)
+    # level 33
+    level_33_enc = res_block(input=level_3_dropout, filters=8 * n_base, kernel_size=kernel_size, stride=2)
+    level_33_dropout = SpatialDropout2D(dropout_rate)(level_33_enc)
 
 
     # Bridge / level 4
-    bridge_in = Conv2D(filters = 8 * n_base, kernel_size=kernel_size, padding='same', strides=(2,2))(level_3_dropout)
+    bridge_in = Conv2D(filters = 16 * n_base, kernel_size=kernel_size, padding='same', strides=(2,2))(level_33_dropout)
     bridge = BatchNormalization()(bridge_in)
     bridge = Activation('relu')(bridge)
-    bridge = Conv2D(filters = 8 * n_base, kernel_size=kernel_size, padding='same', strides=(1,1))(bridge)
+    bridge = Conv2D(filters = 16 * n_base, kernel_size=kernel_size, padding='same', strides=(1,1))(bridge)
     bridge = BatchNormalization()(bridge)
     bridge_out = Activation('relu')(bridge)
 
     # define decoder
+    #level 33
+    bottleneck_up_conv33 = Conv2DTranspose(filters=8 * n_base, kernel_size=kernel_size, strides=(2, 2),
+                                         padding='same')(bridge_out)
+    level_33_concat = concatenate([bottleneck_up_conv33, level_33_enc])
+    level_33_concat = SpatialDropout2D(dropout_rate)(level_33_concat)
+    level_33_dec = res_block(input=level_33_concat, filters=8 * n_base, kernel_size=kernel_size, stride=1)
     # level 3
     bottleneck_up_conv = Conv2DTranspose(filters=4 * n_base, kernel_size=kernel_size, strides=(2, 2),
-                                         padding='same')(bridge_out)
+                                         padding='same')(level_33_dec)
     level_3_concat = concatenate([bottleneck_up_conv, level_3_enc])
     level_3_concat = SpatialDropout2D(dropout_rate)(level_3_concat)
     level_3_dec = res_block(input=level_3_concat, filters=4 * n_base, kernel_size=kernel_size, stride=1)
