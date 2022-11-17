@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
     # base_path = "/home/student/tf-lasse/project/dataset/train"
-    base_path = "../project/dataset/train"
+    base_path = "../dataset/train"
     masks = "training_masks"
     img = "training_images"
 
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     img_ch = 1
 
     # set number of foreground classes
-    n_classes = 2
+    n_classes = 1
     if n_classes > 1:
         binary_mask = False
     else:
@@ -33,10 +33,10 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set validation set split ratio
-    val_split = 0.0  # train using all data
+    val_split = 0.2  # train using all data
 
     # set model parameters
-    dropout_rate = 0.2
+    dropout_rate = 0.4
     use_batch_norm = True
 
     input_size = (img_width, img_height, img_ch)
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     alpha = 0.4
 
     # set number of epochs
-    epochs = 2000
+    epochs = 1500
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                                                                                        img_path=img,
@@ -75,10 +75,12 @@ if __name__ == '__main__':
     unet_hist = unet.fit(train_data_loader[0],
                          epochs=epochs,
                          steps_per_epoch=math.floor(num_train_samples / batch_size),
+                         validation_data=val_data_loader[0],
+                         validation_steps=math.floor(num_val_samples / batch_size),
                          use_multiprocessing=False,
                          workers=1,
                          )
-    unet.save('models/unet_baseline')
+    unet.save('../models/unet_baseline_binary')
     # print model history keys
     print(unet_hist.history.keys())
     segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
