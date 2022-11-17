@@ -7,6 +7,7 @@ from analysis import learning_curves, segment_from_directory
 from loss import dice_loss, combined_loss, combined_loss_class_dice
 from dataloading import load_data
 from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
 import math
 
 if __name__ == '__main__':
@@ -36,26 +37,26 @@ if __name__ == '__main__':
     val_split = 0.2  # train using all data
 
     # set model parameters
-    dropout_rate = 0.4
+    dropout_rate = 0.2
     use_batch_norm = True
 
     input_size = (img_width, img_height, img_ch)
 
-    n_base = 64
+    n_base = 32
     kernel = (3, 3)
-    learning_rate = 0.0005
+    learning_rate = 0.0001
     alpha = 0.4
     beta = 0.3
 
     # set number of epochs
-    epochs = 500
-
-    augmentation_dict = dict(rotation_range = 10,
-                              width_shift_range = 0.2,
-                              height_shift_range = 0.2,
+    epochs = 1000
+    def custom_contrast(filename):
+        return tf.image.random_contrast(filename, lower=-.2, upper=.5)
+    augmentation_dict = dict(rotation_range = 90,
                               zoom_range = [0.1, 1.4],
                               horizontal_flip = True,
-                              fill_mode = 'reflect')
+                              fill_mode = 'reflect',
+                              preprocessing_function = custom_contrast)
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                                                                                        img_path=img,
@@ -63,10 +64,10 @@ if __name__ == '__main__':
                                                                                        val_split=val_split,
                                                                                        batch_size=batch_size,
                                                                                        img_size=(img_width, img_height),
-                                                                                       augmentation_dic=augmentation_dict,
+                                                                                       augmentation_dic=None,
                                                                                        binary_mask=binary_mask,
                                                                                        num_classes=n_classes,
-                                                                                       patch_size=(256, 256))
+                                                                                       patch_size=(128, 128))
 
     print(next(train_data_loader[0])[0].shape)
 
@@ -78,7 +79,7 @@ if __name__ == '__main__':
                     kernel_size=kernel)
     unet.summary()
     unet.compile(optimizer=Adam(learning_rate=learning_rate),
-                 loss=combined_loss_class_dice(alpha=alpha, beta=beta),
+                 loss=combined_loss(alpha=alpha),
                  metrics=[dice_coef, precision, recall, jaccard])
     unet_hist = unet.fit(train_data_loader[0],
                          epochs=epochs,
@@ -88,17 +89,17 @@ if __name__ == '__main__':
                          use_multiprocessing=False,
                          workers=1,
                          )
-    unet.save('models/ResUnet_test')
+    unet.save('models/ResUnet_test_2')
     # print model history keys
     print(unet_hist.history.keys())
     #segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
     #segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset/train", dir="training_images")
-    segment_from_directory(pred_dir="../code/predictions", model=unet, base_dir="../dataset", dir="test")
-    segment_from_directory(pred_dir="../code/predictions", model=unet, base_dir="../dataset/train",
+    segment_from_directory(pred_dir="../code/predictions_res2", model=unet, base_dir="../dataset", dir="test")
+    segment_from_directory(pred_dir="../code/predictions_res2", model=unet, base_dir="../dataset/train",
                            dir="training_images")
     learning_curves(unet_hist, "loss", None, ["dice_coef", "precision", "recall"],
                     None)
 
     learning_curves(unet_hist, "loss", "val_loss",
                    ["dice_coef", "precision", "recall", "jaccard"],
-                    ["val_dice_coef", "val_precision", "val_recall", "val_jaccard"])
+                    ["val_dice_coef", "val_precision", "val_recall", "val_jaccard"], save_path='..models/ResUnet_test_2/curves')
