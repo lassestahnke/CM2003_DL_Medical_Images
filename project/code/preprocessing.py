@@ -77,8 +77,8 @@ def rescale_intensity_from_directory(base_dir, img_dir, mask_dir, new_base_dir=N
     for file in os.listdir(os.path.join(base_dir, img_dir)):
         image = imread(os.path.join(base_dir, img_dir, file), as_gray=True)
         # use contrast stretching
-        p2, p98 = np.percentile(image, (0, 98))
-        image = exposure.rescale_intensity(image, in_range=(p2, p98))
+        p1, p99 = np.percentile(image, (1, 99))
+        image = exposure.rescale_intensity(image, in_range=(p1, p99))
         imsave(os.path.join(new_base_dir, new_img_dir, file[0:-4] + extension), image)
 
     # load and process masks:
