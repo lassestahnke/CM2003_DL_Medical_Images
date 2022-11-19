@@ -118,6 +118,8 @@ Code for creating weight maps provided in <em>[preprocessing.py](code/preprocess
 <figcaption>Dilation weight map for IR_Case_034</figcaption>
 </figure>
 
+#todo: Add mask next to it
+
 ### Setting Up The Residual U-Net
 Original Residual U-Net has been modified by adding one more residual block to increase the depth of the network.
 Due to a small dataset, the original ResUnet has been modified by adding spatial dropout.
