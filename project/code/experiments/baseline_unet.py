@@ -1,6 +1,7 @@
 # CM2003 project
 import os
-
+import sys
+sys.path.append("..")
 from unet import get_unet
 from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves, segment_from_directory
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
     # base_path = "/home/student/tf-lasse/project/dataset/train"
-    base_path = "../dataset/train"
+    base_path = "../../dataset/train"
     masks = "training_masks"
     img = "training_images"
 
@@ -24,10 +25,9 @@ if __name__ == '__main__':
 
     # set number of foreground classes
     n_classes = 1
-    if n_classes > 1:
-        binary_mask = False
-    else:
-        binary_mask = True
+
+    # use one hot encoding:
+    binary_mask = False
 
     # set batch size
     batch_size = 4
@@ -60,7 +60,6 @@ if __name__ == '__main__':
                                                                                        num_classes=n_classes,
                                                                                        patch_size=(256, 256))
 
-    print(next(train_data_loader[0])[0].shape)
 
     # define model
     unet = get_unet(input_shape=(None, None, 1),

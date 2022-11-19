@@ -5,19 +5,6 @@ from tensorflow.keras import Input
 from tensorflow.keras.models import Model
 
 
-def conv_block(input, filters, kernel_size, use_batch_norm):
-    conv_1 = Conv2D(filters, kernel_size=kernel_size, padding='same')(input)
-    if use_batch_norm:
-        conv_1 = BatchNormalization()(conv_1)
-    relu_1 = Activation('relu')(conv_1)
-
-    conv_2 = Conv2D(filters, kernel_size=kernel_size, padding='same')(relu_1)
-    if use_batch_norm:
-        conv_2 = BatchNormalization()(conv_2)
-    relu_2 = Activation('relu')(conv_2)
-
-    return relu_2
-
 def res_block(input, filters, kernel_size, stride):
     identity_conv_shortcut = Conv2D(filters=filters, kernel_size = (1,1), padding='same', strides = (stride,stride))(input)
     conv_1 = Conv2D(filters=filters, kernel_size=kernel_size, padding='same', strides=(stride, stride))(input)

@@ -15,7 +15,8 @@ def combined_loss(alpha):
 def combined_loss_class_dice(alpha, beta):
     def loss(y_true, y_pred):
         cce = CategoricalCrossentropy()
-        return alpha * dice_loss(y_true[...,1], y_pred[...,1]) + beta * dice_loss(y_true[...,2], y_pred[...,2]) + (1 - alpha - beta) * cce(y_true, y_pred)
+        return alpha * dice_loss(y_true[...,1], y_pred[...,1]) + beta * dice_loss(y_true[...,2], y_pred[...,2]) + \
+               (1 - alpha - beta) * cce(y_true, y_pred)
 
     return loss
 
@@ -47,6 +48,8 @@ def combined_weighted_loss(weight_map, weight_strength, alpha):
         weight_f = weight_f + 1
         weighted_intersection = K.sum(weight_f * (y_true_f * y_pred_f)) + K.epsilon()
         cce = CategoricalCrossentropy()
-        return alpha * (1 - (2. * weighted_intersection + K.epsilon()) / (K.sum(y_true_f) + K.sum(y_pred_f) + K.epsilon())) + (1 - alpha) * cce(y_true, y_pred)
+        return alpha * (1 - (2. * weighted_intersection + K.epsilon()) /
+                        (K.sum(y_true_f) + K.sum(y_pred_f) + K.epsilon())) + (1 - alpha) * cce(y_true, y_pred)
+
     return combined_weighted_dice_loss
 
