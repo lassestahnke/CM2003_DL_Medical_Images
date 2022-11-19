@@ -104,7 +104,7 @@ were merged into class "vessel")
 
 ### Training Using Weight Maps
 In order to improve the detection of veins and arteries we try implementing weight maps which would add additional 
-loss penalty to the most important features in images. Weight maps were created using <em>scikit-image</em> package by dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape
+loss penalty to the most important features in images. Weight maps were created using <em>scikit-image</em> package by dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape with a radis
 todo: input example image of the weightmap
 ### Setting Up The Residual U-Net
 Original Residual U-Net has been modified by adding one more residual block to increase the depth of the network.
