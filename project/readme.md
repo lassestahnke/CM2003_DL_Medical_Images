@@ -21,6 +21,11 @@ The objective of the challenge is to correctly segment veins and arteries in the
 - Large images
 - Long range prediction of the vessels
 
+### Metrics
+Since the challenge is ranked by using the mean DSC score, we used mean DSC (averaged over all foreground classes).
+Furthermore, Jaccard is reported in the challenge, thus we used it as a metric as well. In addition to the metrics used 
+in the challenge, we also report recall and precision.  
+
 #### Sample Images
 <img src="dataset/train/training_images/IR_Case_038.png" alt="Training image IR_Case_038" width="150"/>
 <img src="dataset/train/training_masks/IR_Case_038.png" alt="Training image IR_Case_038" width="150"/>
@@ -83,6 +88,8 @@ All other hyperparameters were determined using experience from prior labs in th
 
 In the baseline U-Net, no augmentation was used. 
 
+The objective of this experiment was to choose the set of hyperparameters that results in the best DSC. 
+
 ### Data Augmentation
 In addition to the search of the best hyperparameters for our model, we implement the following data augmentation:
 ```python
@@ -107,7 +114,7 @@ dilation of the provided original segmentation masks using a ```sitk.Ball``` ker
 Code for creating weight maps provided in <em>[preprocessing.py](code/preprocessing.py)</em>
 
 <figure>
-<img src="/dataset/train/training_masks_dilated/IR_Case_034.png" alt="Weight map IR_Case_034" width="300"/>
+<img src="dataset/train/training_masks_dilated/IR_Case_034.png" alt="Weight map IR_Case_034" width="300"/>
 <figcaption>Dilation weight map for IR_Case_034</figcaption>
 </figure>
 
