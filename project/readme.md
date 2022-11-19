@@ -61,7 +61,7 @@ semantic information and Residual networks using identity mapping [[5]](#5) that
 Residual unet
 
 <figure>
-<img src="https://d3i71xaburhd42.cloudfront.net/f06ff5f719eb9cd939dde8fc9b199b17adcbc75f/2-Figure2-1.png" alt="Base ResUnet diagram" width="300"/>
+<img src="https://ieeexplore.ieee.org/mediastore_new/IEEE/content/media/8859/8344090/8309343/liu2-2802944-large.gif" alt="Base ResUnet diagram" width="300"/>
 <figcaption>Original ResUnet diagram</figcaption>
 </figure>
 
@@ -104,7 +104,8 @@ were merged into class "vessel")
 
 ### Training Using Weight Maps
 In order to improve the detection of veins and arteries we try implementing weight maps which would add additional 
-loss penalty to the most important features in images. Weight maps were created using <em>scikit-image</em> package by dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape with a radis
+loss penalty to the most important features in images. Weight maps were created using <em>scikit-image</em> package by 
+dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape with a radius 2
 todo: input example image of the weightmap
 ### Setting Up The Residual U-Net
 Original Residual U-Net has been modified by adding one more residual block to increase the depth of the network.
