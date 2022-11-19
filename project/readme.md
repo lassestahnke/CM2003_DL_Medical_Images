@@ -66,12 +66,10 @@ Residual unet
 </figure>
 
 
-
-
 ## Experiments
 ### Setting Up The Baseline U-Net
 First, we set up a baseline U-Net with slight modifications to the original U-Net paper.
-(i.e. batch normalization, dropout, padding: same) This model was used to compare the results against to and as a 
+(i.e. batch normalization, spatial dropout, padding: same) This model was used to compare the results against to and as a 
 starting point for the following experiments. 
 
 The hyperparameters were determined using a grid search. Following hyperparameters were included in the grid search:
@@ -105,11 +103,18 @@ were merged into class "vessel")
 ### Training Using Weight Maps
 In order to improve the detection of veins and arteries we try implementing weight maps which would add additional 
 loss penalty to the most important features in images. Weight maps were created using <em>scikit-image</em> package by 
-dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape with a radius 2
-todo: input example image of the weightmap
+dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape with a radius 2. 
+Code for creating weight maps provided in <em>[preprocessing.py](code/preprocessing.py)</em>
+
+<figure>
+<img src="/dataset/train/training_masks_dilated/IR_Case_034.png" alt="Weight map IR_Case_034" width="300"/>
+<figcaption>Dilation weight map for IR_Case_034</figcaption>
+</figure>
+
 ### Setting Up The Residual U-Net
 Original Residual U-Net has been modified by adding one more residual block to increase the depth of the network.
-Used  Architecture can be found in <em>[ResUnet.py](code/ResUnet.py)</em>
+Due to a small dataset, the original ResUnet has been modified by adding spatial dropout.
+Used Architecture can be found in <em>[ResUnet.py](code/ResUnet.py)</em>
 
 ## Results
 
