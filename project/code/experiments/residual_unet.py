@@ -46,17 +46,16 @@ if __name__ == '__main__':
     kernel = (3, 3)
     learning_rate = 0.0001
     alpha = 0.4
-    beta = 0.3
+    #beta = 0.3
 
     # set number of epochs
-    epochs = 1000
+    epochs = 500
     def custom_contrast(filename):
         return tf.image.random_contrast(filename, lower=-.2, upper=.5)
     augmentation_dict = dict(rotation_range = 90,
                               zoom_range = [0.1, 1.4],
                               horizontal_flip = True,
-                              fill_mode = 'reflect',
-                              preprocessing_function = custom_contrast)
+                              fill_mode = 'reflect')
 
     train_data_loader, val_data_loader, num_train_samples, num_val_samples = load_data(base_path=base_path,
                                                                                        img_path=img,
@@ -64,7 +63,7 @@ if __name__ == '__main__':
                                                                                        val_split=val_split,
                                                                                        batch_size=batch_size,
                                                                                        img_size=(img_width, img_height),
-                                                                                       augmentation_dic=None,
+                                                                                       augmentation_dic=False,
                                                                                        binary_mask=binary_mask,
                                                                                        num_classes=n_classes,
                                                                                        patch_size=(128, 128))
