@@ -6,10 +6,25 @@ frequency might be skewed, even though both team members contributed equally to 
 
 
 ## How to Run the Code?
- #todo: add running instructions 
+The [main.py](code/main.py) file loads the trained models and does sample predictions.
+It loads the baseline U-Net, the binary U-Net, the ResU-Net and the weighted U-Net.
 
-The main.py file loads the trained models and does sample predictions on the validation set.  
+The directory [experiments](code/experiments) contains the python scripts that were used in the experiments that are 
+described below. Here, [baseline_unet.py](code/experiments/baseline_unet.py) contains all parameters for the baseline
+U-Net, [grid_search_base_unet.py](code/experiments/grid_search_base_unet.py) contains all settings that were used for
+the grid search, [unet_weighted_masks.py](code/experiments/unet_weighted_masks.py) contains the script to run the 
+training with the dilated masks and [residual_unet.py](code/experiments/residual_unet.py) was used to train the ResU-Net.
+All files in the directory can be re-run again to repeat the respective experiment. 
 
+In the [code](code) directory, all python code can be found including the metrics, losses, and network architectures. 
+
+The [dataset](dataset) directory includes all training and test images with the respective segmentation masks. 
+
+The [grid_search](grid_search) directory contains the result of the gridsearch as .json files, where each json file
+corresponds to one set of parameters. 
+
+Finally, the [predictions](predictions) directory contains the predictions for each model in the correct file format to 
+submit them to the challenge on grand-challenge.org. 
 
 ## RAVIR Dataset
 The dataset was taken from the grand-challenge.org page for the segmentation challenge. (https://ravir.grand-challenge.org)
