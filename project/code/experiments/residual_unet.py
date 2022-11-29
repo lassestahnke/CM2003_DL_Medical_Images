@@ -1,7 +1,6 @@
 # CM2003 project
 import os
 import sys
-
 sys.path.append("..")
 from ResUnet import get_ResUnet
 from metrics import dice_coef, precision, recall, jaccard
@@ -16,7 +15,7 @@ if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
     # base_path = "/home/student/tf-lasse/project/dataset/train"
-    base_path = "../dataset/train"
+    base_path = "../../dataset/train"
     masks = "training_masks"
     img = "training_images"
 
@@ -36,10 +35,10 @@ if __name__ == '__main__':
     batch_size = 4
 
     # set validation set split ratio
-    val_split = 0.2  # train using all data
+    val_split = 0  # train using all data
 
     # set model parameters
-    dropout_rate = 0.2
+    dropout_rate = 0.4
     use_batch_norm = True
 
     input_size = (img_width, img_height, img_ch)
@@ -65,12 +64,11 @@ if __name__ == '__main__':
                                                                                        val_split=val_split,
                                                                                        batch_size=batch_size,
                                                                                        img_size=(img_width, img_height),
-                                                                                       augmentation_dic=False,
+                                                                                       augmentation_dic=None,
                                                                                        binary_mask=binary_mask,
                                                                                        num_classes=n_classes,
-                                                                                       patch_size=(128, 128))
+                                                                                       patch_size=(256, 256))
 
-    print(next(train_data_loader[0])[0].shape)
 
     # define model
     unet = get_ResUnet(input_shape=(None, None, 1),
@@ -85,22 +83,26 @@ if __name__ == '__main__':
     unet_hist = unet.fit(train_data_loader[0],
                          epochs=epochs,
                          steps_per_epoch=math.floor(num_train_samples / batch_size),
-                         validation_data=val_data_loader[0],
-                         validation_steps=math.floor(num_val_samples / batch_size),
+                         # validation_data=val_data_loader[0],
+                         # validation_steps=math.floor(num_val_samples / batch_size),
                          use_multiprocessing=False,
                          workers=1,
                          )
-    unet.save('models/ResUnet_test_2')
+    unet.save('../../models/ResUnet_baseline')
     # print model history keys
     print(unet_hist.history.keys())
-    #segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset", dir="test")
-    #segment_from_directory(pred_dir="predictions", model=unet, base_dir="dataset/train", dir="training_images")
-    segment_from_directory(pred_dir="../code/predictions_res2", model=unet, base_dir="../dataset", dir="test")
-    segment_from_directory(pred_dir="../code/predictions_res2", model=unet, base_dir="../dataset/train",
+    segment_from_directory(pred_dir="../../predictions/ResUnet_baseline", model=unet, base_dir="../../dataset", dir="test")
+    segment_from_directory(pred_dir="../../predictions/ResUnet_baseline", model=unet, base_dir="../../dataset/train",
                            dir="training_images")
     learning_curves(unet_hist, "loss", None, ["dice_coef", "precision", "recall"],
                     None)
 
-    learning_curves(unet_hist, "loss", "val_loss",
+    # with val
+    # learning_curves(unet_hist, "loss", "val_loss",
+    #                ["dice_coef", "precision", "recall", "jaccard"],
+    #                 ["val_dice_coef", "val_precision", "val_recall", "val_jaccard"], save_path='../../predictions/ResUnet_baseline/curves')
+
+    # no val
+    learning_curves(unet_hist, "loss", None,
                    ["dice_coef", "precision", "recall", "jaccard"],
-                    ["val_dice_coef", "val_precision", "val_recall", "val_jaccard"], save_path='..models/ResUnet_test_2/curves')
+                    None, save_path='../../predictions/ResUnet_baseline/curves')
