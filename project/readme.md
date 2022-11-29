@@ -178,19 +178,21 @@ For the following experiments, the hyperparameter-set of the best network in thi
 In the following table, the result of the baseline U-Net can be seen. These results were calculated on the test set 
 automatically by the challenge entry. As of the date of our first submission, the best achieved Dice score in the 
 challenge was 0.81. It should be noted that the test dice is substantially worse than the validation dice that was 
-achieved during the grid search. Thus, the chosen data-split of the training data might not represent the test set very 
-well or includes "easier" cases. It can be also seen that the vein Dice of our model is substantially better than the 
-artery dice. 
-
-This behaviour could maybe be improved by using weight maps that weigh the arteries higher. The main problem on the 
-dice metric is the mis-classification of vessels again rather than the vessel-detection. Thus, increasing the receptive
-field might help with improving the long range predictions here. Also, a patched based training was used, due to memory 
-limitations. This might have reduced the ability of the network to make long range predictions as well. 
+achieved during the grid search. 
 
 | Dataset |   Mean Dice   |  Artery Dice  |   Vein Dice   | Mean Jaccard  | Artery Jaccard |
 |:-------:|:-------------:|:-------------:|:-------------:|:-------------:|:--------------:|
 |  Test   | 0.4208±0.0586 | 0.3599±0.0535 | 0.4818±0.0646 | 0.2702±0.0483 | 0.2207±0.0402  |
 
+#### Discussion
+The test dice is substantially worse than the validation dice. Thus, the chosen data-split of the training data might not represent the test set very 
+well or includes "easier" cases. It can be also seen that the vein Dice of our model is substantially better than the 
+artery dice. 
+
+This behaviour could maybe be improved by using weight maps that weigh the arteries higher. The main problem on the 
+dice metric is the miss-classification of vessels again rather than the vessel-detection. Thus, increasing the receptive
+field might help with improving the long range predictions here. Also, a patched based training was used, due to memory 
+limitations. This might have reduced the ability of the network to make long range predictions as well. 
 
 ### Binary classification
 |                  Loss                  |               Dice Score               |                  Precision                  |                  Recall                  |
