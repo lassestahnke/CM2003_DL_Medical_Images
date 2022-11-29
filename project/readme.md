@@ -59,7 +59,12 @@ grayscale segmentation maps that correspond to the challenge requirements using 
 
 ## CNN Architectures used in the challenge
 ### U-Net [[1]](#1)
-TODO: insert block diagram of the architecture
+
+<figure>
+<img src="https://lmb.informatik.uni-freiburg.de/people/ronneber/u-net/u-net-architecture.png" alt="Base ResUnet diagram" width="600"/>
+<figcaption>Original U-Net diagram</figcaption>
+</figure>
+
 ### Residual U-Net [[2]](#2)
 Residual U-Net allows us to take advantage of U-Net in which we combine low level detail information with high level 
 semantic information and Residual networks using identity mapping [[5]](#5) that facilitates training.
@@ -115,9 +120,9 @@ Code for creating weight maps provided in <em>[preprocessing.py](code/preprocess
 
 
 
-Dilation weight map for IR_Case_034          |  Original mask for IR_Case_034
-:-------------------------:|:-------------------------:
-![](dataset/train/training_masks_dilated/IR_Case_034.png)  |  ![](dataset/train/training_masks/IR_Case_034.png)
+|            Dilation weight map for IR_Case_034            |  Original mask for IR_Case_034|
+|:---------------------------------------------------------:|:-------------------------:|
+| ![](dataset/train/training_masks_dilated/IR_Case_034.png) |  ![](dataset/train/training_masks/IR_Case_034.png)|
 
 
 ### Setting Up The Residual U-Net
