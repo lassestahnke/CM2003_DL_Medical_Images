@@ -127,6 +127,9 @@ Used Architecture can be found in <em>[ResUnet.py](code/ResUnet.py)</em>
 
 ## Results
 
+### Binary classification
+
+
 ## Discussion
 
 
