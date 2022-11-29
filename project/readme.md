@@ -132,7 +132,10 @@ Loss         |               Dice Score               |                  Precisi
 :-------------------------:|:--------------------------------------:|:-------------------------------------------:|:-------------------------:
 ![](predictions/binary_model/dice.png)  | ![](predictions/binary_model/loss.png) | ![](predictions/binary_model/precision.png) | ![](predictions/binary_model/recall.png) 
 
-
+|  Dataset   |   Loss    |   Dice Score    |                  Precision                  | Recall
+:----------:|:---------:|:---------------:|:-------------------------------------------:|:-------------------------:
+ Train| loss train | dsc train | precisoin trian | recall train 
+ Test| loss train | dsc train | precisoin trian | recall train 
 
 ## Discussion
 
