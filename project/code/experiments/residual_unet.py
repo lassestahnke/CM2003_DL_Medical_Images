@@ -1,6 +1,8 @@
 # CM2003 project
 import os
+import sys
 
+sys.path.append("..")
 from ResUnet import get_ResUnet
 from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves, segment_from_directory

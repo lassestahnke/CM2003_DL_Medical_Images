@@ -1,6 +1,7 @@
 # CM2003 project
 import os
-
+import sys
+sys.path.append("..")
 from unet import get_unet
 from metrics import dice_coef, precision, recall, jaccard
 from loss import dice_loss, combined_loss
