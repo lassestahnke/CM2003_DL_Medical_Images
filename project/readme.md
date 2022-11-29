@@ -128,6 +128,10 @@ Used Architecture can be found in <em>[ResUnet.py](code/ResUnet.py)</em>
 ## Results
 
 ### Binary classification
+Loss         |               Dice Score               |                  Precision                  | Recall
+:-------------------------:|:--------------------------------------:|:-------------------------------------------:|:-------------------------:
+![](predictions/binary_model/dice.png)  | ![](predictions/binary_model/loss.png) | ![](predictions/binary_model/Precision.png) | ![](predictions/binary_model/recall.png) 
+
 
 
 ## Discussion
