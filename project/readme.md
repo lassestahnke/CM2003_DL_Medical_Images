@@ -197,6 +197,8 @@ limitations. This might have reduced the ability of the network to make long ran
 Adding augmentation to the baseline model was also tested but did not improve the segmentation results substantially and
 thus, was excluded from this report. 
 
+### Ba
+
 ### Binary classification
 |                  Loss                  |               Dice Score               |                  Precision                  |                  Recall                  |
 |:--------------------------------------:|:--------------------------------------:|:-------------------------------------------:|:----------------------------------------:|
