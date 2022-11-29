@@ -113,12 +113,12 @@ loss penalty to the most important features in images. Weight maps were created 
 dilation of the provided original segmentation masks using a ```sitk.Ball``` kernel shape with a radius 2. 
 Code for creating weight maps provided in <em>[preprocessing.py](code/preprocessing.py)</em>
 
-<figure>
-<img src="dataset/train/training_masks_dilated/IR_Case_034.png" alt="Weight map IR_Case_034" width="300"/>
-<figcaption>Dilation weight map for IR_Case_034</figcaption>
-</figure>
 
-#todo: Add mask next to it
+
+Dilation weight map for IR_Case_034          |  Original mask for IR_Case_034
+:-------------------------:|:-------------------------:
+![](dataset/train/training_masks_dilated/IR_Case_034.png)  |  ![](dataset/train/training_masks/IR_Case_034.png)
+
 
 ### Setting Up The Residual U-Net
 Original Residual U-Net has been modified by adding one more residual block to increase the depth of the network.
