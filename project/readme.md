@@ -194,6 +194,9 @@ dice metric is the miss-classification of vessels again rather than the vessel-d
 field might help with improving the long range predictions here. Also, a patched based training was used, due to memory 
 limitations. This might have reduced the ability of the network to make long range predictions as well. 
 
+Adding augmentation to the baseline model was also tested but did not improve the segmentation results substantially and
+thus, was excluded from this report. 
+
 ### Binary classification
 |                  Loss                  |               Dice Score               |                  Precision                  |                  Recall                  |
 |:--------------------------------------:|:--------------------------------------:|:-------------------------------------------:|:----------------------------------------:|
