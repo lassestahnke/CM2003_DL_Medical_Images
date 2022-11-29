@@ -109,13 +109,13 @@ if __name__ == '__main__':
                          workers=1,
                          )
 
-    unet.save('../../models/unet_dilated_mask')
+    unet.save('../../models/unet_dilated_weight_mask')
     # print model history keys
     print(unet_hist.history.keys())
-    segment_from_directory_weighted(pred_dir="predictions_weighted", model=unet, base_dir="dataset", dir="test")
-    segment_from_directory_weighted(pred_dir="predictions_weighted", model=unet, base_dir="dataset/train", dir="training_images")
+    segment_from_directory_weighted(pred_dir="../../predictions/unet_dilated_weight_mask", model=unet, base_dir="../../dataset", dir="test")
+    segment_from_directory_weighted(pred_dir="../../predictions/unet_dilated_weight_mask", model=unet, base_dir="../../dataset/train", dir="training_images")
 
     learning_curves(unet_hist, "loss", "val_loss", ["dice_coef", "precision", "recall", "jaccard"],
-                    ["val_dice_coef", "val_precision", "val_recall", "jaccard"], save_path='../../models/unet_dilated_mask/curves')
+                    ["val_dice_coef", "val_precision", "val_recall", "jaccard"], save_path='../../models/unet_dilated_weight_mask')
 
     K.clear_session()
