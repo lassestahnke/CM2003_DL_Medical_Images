@@ -197,7 +197,20 @@ limitations. This might have reduced the ability of the network to make long ran
 Adding augmentation to the baseline model was also tested but did not improve the segmentation results substantially and
 thus, was excluded from this report. 
 
-### Ba
+### Baseline U-Net with weight map
+
+While evaluating the model using 0.2 validation split we obtain training curves that can be seen below. The validation 
+dice coefficient values around 0.5, however the scores achieved in the challenge are substantially lower (Mean Dice coefficient 0.3314±0.0632).
+
+
+
+|                                 Loss                                  |                         Dice Score                          |                               Precision                               |                               Recall                               |                            Jaccard Score                            |
+|:---------------------------------------------------------------------:|:-----------------------------------------------------------:|:---------------------------------------------------------------------:|:------------------------------------------------------------------:|:-------------------------------------------------------------------:|
+| ![](predictions/unet_dilated_weight_mask/curves/dice_coef_metric.png) | ![](predictions/unet_dilated_weight_mask/curves/losses.png) | ![](predictions/unet_dilated_weight_mask/curves/precision_metric.png) | ![](predictions/unet_dilated_weight_mask/curves/recall_metric.png) | ![](predictions/unet_dilated_weight_mask/curves/jaccard_metric.png) |
+
+
+#### Discussion
+
 
 ### Binary classification
 |                  Loss                  |               Dice Score               |                  Precision                  |                  Recall                  |
