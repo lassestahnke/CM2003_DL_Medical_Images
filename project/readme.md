@@ -7,7 +7,8 @@ frequency might be skewed, even though both team members contributed equally to 
 
 ## How to Run the Code?
 The [main.py](code/main.py) file loads the trained models and does sample predictions.
-It loads the baseline U-Net, the binary U-Net, the ResU-Net and the weighted U-Net.
+It loads the baseline U-Net, the binary U-Net, the ResU-Net and the weighted U-Net. (<b> Notice that the models could
+not be uploaded to it due to their size. Instead, they have been uploaded to the KTH server.</b>)
 
 The directory [experiments](code/experiments) contains the python scripts that were used in the experiments that are 
 described below. Here, [baseline_unet.py](code/experiments/baseline_unet.py) contains all parameters for the baseline
@@ -130,7 +131,7 @@ fill_mode = 'reflect',
 ```
 
 ### Binary Classification
-Since the precious experiments showed worse results than expected, the main hypothesis was that the vessels are
+Since the previous experiments showed worse results than expected, the main hypothesis was that the vessels are
 detected but classified poorly into arteries and veins. Thus, we performed this experiment, where we trained a U-Net 
 using the result of the grid search as hyperparameters but using only binary segmentation maps. (i.e. arteries and veins
 were merged into class "vessel")
@@ -155,6 +156,15 @@ Used Architecture can be found in <em>[ResUnet.py](code/ResUnet.py)</em>
 
 ## Results and Discussions
 ### Grid Search
+In the following table, the best 5 cases of the grif search and their parameters can be seen. The table is sorted from
+best to worst validation dice score. To improve robustness of the choice of hyperparameters and to suppress noise, the
+metrics were averaged over the last 5 epochs. It can be seen that the two best networks both use 64 feature maps on
+the first level of the U-Net. It can be also seen that the best network is superior in all metrics, including pecision 
+and recall. Furthermore, it should be noted that the parameter "alpha" refers to the weight that was
+used in the weighted combined loss that incorporated dice loss and cross entropy loss.  
+
+For the following experiments, the hyperparameter-set of the best network in this case has was used.  
+
 
 | n_base | learning_rate | alpha | kernel_size | augmentation | epochs |   loss   | val_loss | dice_coef | val_dice_coef | precision | val_precision |  recall  | val_recall | jaccard  | val_jaccard |
 |:------:|:-------------:|:-----:|:-----------:|:------------:|:------:|:--------:|:--------:|:---------:|:-------------:|:---------:|:-------------:|:--------:|:----------:|:--------:|:-----------:|
@@ -165,7 +175,17 @@ Used Architecture can be found in <em>[ResUnet.py](code/ResUnet.py)</em>
 |   32   |    0.0001     |  0.4  |   [3, 3]    |     None     |  700   | 0.162371 | 0.236693 | 0.747658  |   0.616998    | 0.944697  |   0.922116    | 0.944697 |  0.922116  | 0.895331 |  0.855859   |
 
 ### Baseline Model
+In the following table, the result of the baseline U-Net can be seen. These results were calculated on the test set 
+automatically by the challenge entry. As of the date of our first submission, the best achieved Dice score in the 
+challenge was 0.81. It should be noted that the test dice is substantially worse than the validation dice that was 
+achieved during the grid search. Thus, the chosen data-split of the training data might not represent the test set very 
+well or includes "easier" cases. It can be also seen that the vein Dice of our model is substantially better than the 
+artery dice. 
 
+This behaviour could maybe be improved by using weight maps that weigh the arteries higher. The main problem on the 
+dice metric is the mis-classification of vessels again rather than the vessel-detection. Thus, increasing the receptive
+field might help with improving the long range predictions here. Also, a patched based training was used, due to memory 
+limitations. This might have reduced the ability of the network to make long range predictions as well. 
 
 | Dataset |   Mean Dice   |  Artery Dice  |   Vein Dice   | Mean Jaccard  | Artery Jaccard |
 |:-------:|:-------------:|:-------------:|:-------------:|:-------------:|:--------------:|
@@ -203,6 +223,10 @@ Even though, this dice score is reasonably high, the network fails to properly s
 might be caused by under-representation of thin vessels in the Dice score. (i.e. there are more thick vessels that are 
 easier to segment and consequently weigh more in the dice score) 
 
+Since the segmentation metrics are quite good already and the classification of the vessel type seems to be the problem, 
+we do not expect a substantial improvement in the segmentation result for the multiclass segmentation when using 
+transfer-learning using a network that was pretrained on a binary retinal-vessel dataset such as the DRIVE dataset.
+
 
 
 ### Baseline ResUnet Model
@@ -234,7 +258,7 @@ by us which means that metrics we use are not representative of the actual score
 ## Suggested further improvements/ideas
 - ResUnet-a is based on the Residual U-Net which uses diluted convolutions to improve the receptive field of the network [[3]](#3)
 - Using weight maps that have a higher weight for thinner structures to emphasize those regions in the training.
-
+- Avoid having to draw patches by using a lower resolution model for the center and a high resolution model for smaller parts of the vessels. 
 ## References
 <a id="1">[1]</a>
 O. Ronneberger, P. Fischer, and T. Brox, “U-Net: Convolutional Networks for Biomedical Image Segmentation.” arXiv, May 18, 2015. doi: 10.48550/arXiv.1505.04597.
