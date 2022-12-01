@@ -5,7 +5,7 @@ sys.path.append("..")
 from ResUnet import get_ResUnet
 from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves, segment_from_directory
-from loss import dice_loss, combined_loss, combined_loss_class_dice
+from loss import dice_loss, combined_loss
 from dataloading import load_data
 from tensorflow.keras.optimizers import Adam
 import tensorflow as tf

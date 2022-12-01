@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # testing baseline model for retinal vessel segmentation
     # set paths to data
     # base_path = "/home/student/tf-lasse/project/dataset/train"
-    base_path = "../project/dataset/train"
+    base_path = "../../dataset/train"
     masks = "training_masks"
     img = "training_images"
 

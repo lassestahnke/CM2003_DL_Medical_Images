@@ -60,14 +60,15 @@ in the challenge, we also report recall and precision.
 ## Segmentation Pipeline
 This segment describes the whole segmentation pipeline that was used int the experiments.
 ### Preprocessing
-The intensity of the images was rescaled to 1th and 99th percentile. When loading the images, they were normalized 
-between 0 and 1. Furthermore, random patched of size 256x256 were drawn for training the network to reduce memory 
+Random patched of size 256x256 were drawn for training the network to reduce memory 
 demand and as a kind of augmentation. 
 
 The masks were loaded and converted from grayscale to one-hot encoding. Furthermore, the corresponding patched were 
 drawn for training of the network.
 
 All images and masks were loaded in the GPU to increase training time and reduce CPU memory usage.
+
+Furthermore, intensity scaling was tested, but was removed eventually, as it didn't improve the segmentation results.
 
 ### Training
 For all experiments, the Adam optimizer [[4]](#4) was used. Furthermore, for the hyperparameter optimizatiion, the 

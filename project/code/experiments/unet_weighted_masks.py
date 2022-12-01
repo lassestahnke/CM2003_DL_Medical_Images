@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append("..")
-from unet import get_unet, get_unet_weighted
+from unet import get_unet_weighted
 from metrics import dice_coef, precision, recall, jaccard
 from analysis import learning_curves, segment_from_directory, segment_from_directory_weighted
 from loss import dice_loss, combined_loss, weighted_loss, combined_weighted_loss
@@ -83,10 +83,6 @@ if __name__ == '__main__':
                                                                                                         num_classes=n_classes,
                                                                                                         patch_size=(256, 256))
 
-    #print(next(train_data_loader[0])[0][1])
-    #print("image gen shape:", next(train_data_loader[0])[0][0].shape)
-    #print("weight map gen shape:", next(train_data_loader[0])[0][1].shape)
-    #print("mask gen shape:", next(train_data_loader[0])[1].shape)
 
     # define model
     unet, loss_weights = get_unet_weighted(input_shape=(None, None, 1),
