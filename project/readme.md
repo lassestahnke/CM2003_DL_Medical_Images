@@ -203,15 +203,36 @@ thus, was excluded from this report.
 While evaluating the model using 0.2 validation split we obtain training curves that can be seen below. The validation 
 dice coefficient values around 0.5, however the scores achieved in the challenge are substantially lower (Mean Dice coefficient 0.3314±0.0632).
 
+<p style="text-align: center;">Metrics for the model trained with validation</p>
 
+|                              Loss                              |                      Dice Score                      |                           Precision                            |                           Recall                            |                        Jaccard Score                         |
+|:--------------------------------------------------------------:|:----------------------------------------------------:|:--------------------------------------------------------------:|:-----------------------------------------------------------:|:------------------------------------------------------------:|
+| ![](predictions/unet_dilated_weight_mask/dice_coef_metric.png) | ![](predictions/unet_dilated_weight_mask/losses.png) | ![](predictions/unet_dilated_weight_mask/precision_metric.png) | ![](predictions/unet_dilated_weight_mask/recall_metric.png) | ![](predictions/unet_dilated_weight_mask/jaccard_metric.png) |
+
+<p style="text-align: center;">Challenge results for the model trained with validation</p>
+
+| Dataset |   Mean Dice    |  Artery Dice  |   Vein Dice   | Mean Jaccard  | Artery Jaccard |
+|:-------:|:--------------:|:-------------:|:-------------:|:-------------:|:--------------:|
+|  Test   | 	0.3314±0.0632 | 0.2841±0.0539 | 0.3788±0.0734 | 0.2014±0.0467 | 0.1666±0.0371  |
+
+<p style="text-align: center;">Metrics for the model trained without validation - Full train dataset</p>
 
 |                                 Loss                                  |                         Dice Score                          |                               Precision                               |                               Recall                               |                            Jaccard Score                            |
 |:---------------------------------------------------------------------:|:-----------------------------------------------------------:|:---------------------------------------------------------------------:|:------------------------------------------------------------------:|:-------------------------------------------------------------------:|
-| ![](predictions/unet_dilated_weight_mask/curves/dice_coef_metric.png) | ![](predictions/unet_dilated_weight_mask/curves/losses.png) | ![](predictions/unet_dilated_weight_mask/curves/precision_metric.png) | ![](predictions/unet_dilated_weight_mask/curves/recall_metric.png) | ![](predictions/unet_dilated_weight_mask/curves/jaccard_metric.png) |
+| ![](predictions/unet_dilated_weight_mask_no_val/dice_coef_metric.png) | ![](predictions/unet_dilated_weight_mask_no_val/losses.png) | ![](predictions/unet_dilated_weight_mask_no_val/precision_metric.png) | ![](predictions/unet_dilated_weight_mask_no_val/recall_metric.png) | ![](predictions/unet_dilated_weight_mask_no_val/jaccard_metric.png) |
 
+
+<p style="text-align: center;">Challenge results for the model trained without validation - Full train dataset</p>
+
+| Dataset |   Mean Dice    |  Artery Dice  |   Vein Dice   | Mean Jaccard  | Artery Jaccard |
+|:-------:|:--------------:|:-------------:|:-------------:|:-------------:|:--------------:|
+|  Test   | 	0.4326±0.0498 | 0.3732±0.0463 | 0.4919±0.0545 | 0.2791±0.0416 | 0.2304±0.0352  |
 
 #### Discussion
 
+The results achieved using weight maps when we used 19 images for training and 4 images for validation were the worst 
+out of all trials during this project. However using the entire train data set for training allowed us to achieve the 
+highest scores out of all methods. It shows the importance of using all possible images while working on very small datasets.
 
 ### Binary classification
 |                  Loss                  |               Dice Score               |                  Precision                  |                  Recall                  |
